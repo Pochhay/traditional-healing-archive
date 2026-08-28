@@ -7,17 +7,19 @@
 // ============================================================
 
 const collection = {
-  // What does your archive collect? e.g. "Khmer Proverbs"
-  name: "Traditional Healing Methods",
+  // What does your archive collect?
+  name: "Khmer Herbal Plant Archive",
 
   // One sentence: what is this archive, and why does it matter?
-  description: "The complete oral knowledge of herbal recipes, bone-setting techniques, and spiritual healing rituals.",
+  description:
+    "A structured digital archive documenting the medicinal plants of Cambodia — their botany, chemistry, habitats, and traditional therapeutic uses.",
 
   // Who is building this archive? Your name, as you want it shown.
   curator: "Pochhay, ENG",
 
-  // Where does your knowledge come from? A person, a place, a community.
-  source: "Kru Khmer (traditional healers) from different provinces, alongside the endangered medical manuscripts (kpuon) held in provincial pagodas and monasteries.",
+  // Where does your knowledge come from?
+  source:
+    "Published ethnobotanical and pharmacological records of Cambodian flora, cross-referenced with plants documented in provincial markets and home gardens across Cambodia.",
 };
 
 export default collection;

@@ -1,28 +1,30 @@
+"use client";
+import React, { useState } from 'react';
 const styles = {
   card: {
     padding: 24,
-    backgroundColor: "#1E2B21",
-    border: "1px solid #35473A",
-    borderLeft: "3px solid #A8C686",
+    backgroundColor: "#FFFFFF",
+    border: "1px solid #D3CEBE",
+    borderLeft: "3px solid #4D6B58",
     borderRadius: 10,
   },
   nameKhmer: {
     fontSize: 26,
-    color: "#F3EFD9",
+    color: "#1A2820",
     margin: "0 0 4px",
     lineHeight: 1.3,
   },
   nameEnglish: {
     fontSize: 18,
     fontWeight: 600,
-    color: "#C2CCAE",
+    color: "#1A2820",
     margin: "0 0 2px",
   },
   scientific: {
     fontFamily: "Georgia, 'Times New Roman', serif",
     fontStyle: "italic",
-    fontSize: 15,
-    color: "#A8C686",
+    fontSize: 16,
+    color: "#1A2820",
     margin: "0 0 16px",
   },
   photo: {
@@ -31,20 +33,20 @@ const styles = {
     objectFit: "cover",
     borderRadius: 8,
     marginBottom: 16,
-    border: "1px solid #35473A",
+    border: "1px solid #D3CEBE",
   },
   label: {
     fontFamily: "Georgia, 'Times New Roman', serif",
     fontSize: 12,
-    color: "#9DB48A",
+    color: "#4D6B58",
     margin: "14px 0 0",
     textTransform: "uppercase",
     letterSpacing: 1,
   },
   value: {
-    fontSize: 15,
-    color: "#E5DFC3",
-    lineHeight: 1.6,
+    fontSize: 16,
+    color: "#1A2820",
+    lineHeight: 1.8,
     margin: "4px 0 0",
   },
 };
@@ -83,8 +85,19 @@ export default function EntryCard({
   uses,
 }) {
 
+const [isHovered, setIsHovered] = useState(false);
+   const cardStyle = {
+     ...styles.card,
+     transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
+     transition: 'transform 0.2s ease, border-color 0.2s ease',
+     borderLeftColor: isHovered ? '#C8E6A9' : styles.card.borderLeft,
+   };
   return (
-    <article style={styles.card}>
+    <article
+       style={cardStyle}
+       onMouseEnter={() => setIsHovered(true)}
+       onMouseLeave={() => setIsHovered(false)}
+     >
       <img
         src={image}
         alt={`${nameEnglish} (${nameKhmer})`}

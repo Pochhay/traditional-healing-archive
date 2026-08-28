@@ -1,7 +1,7 @@
 import collection from "../collection.config.js";
 
 export const metadata = {
-  title: `${collection.name} — Khmer Living Archive`,
+  title: collection.name,
   description: collection.description,
 };
 
@@ -11,8 +11,8 @@ export default function RootLayout({ children }) {
       <body
         style={{
           margin: 0,
-          backgroundColor: "#14181F",
-          color: "#E8EDF2",
+          backgroundColor: "#F6F4ED",
+          color: "#1A2820",
           fontFamily:
             "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
           minHeight: "100vh",
