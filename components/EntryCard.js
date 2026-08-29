@@ -1,5 +1,5 @@
-"use client";
-import React, { useState } from 'react';
+import React from 'react';
+
 const styles = {
   card: {
     padding: 24,
@@ -51,7 +51,6 @@ const styles = {
   },
 };
 
-// Single source of truth: field key -> { label, propName }
 const FIELDS = [
   { label: "Species / Family", prop: "family" },
   { label: "Description", prop: "description" },
@@ -60,19 +59,6 @@ const FIELDS = [
   { label: "Medicinal Uses & Indications", prop: "uses" },
 ];
 
-/**
- * PlantCard displays a single Khmer medicinal plant entry.
- * @param {Object} props
- * @param {string} props.nameKhmer       Khmer name (e.g. "ស្តៅ")
- * @param {string} props.nameEnglish     Common English name (e.g. "Siamese Neem")
- * @param {string} props.scientificName  Botanical name (e.g. "Azadirachta indica var. siamensis")
- * @param {string} props.family          Botanical family
- * @param {string} props.image           Image path under /public/images/
- * @param {string} props.description     Physical characteristics
- * @param {string} props.habitat         Where it grows in Cambodia
- * @param {string} props.compounds       Key phytochemicals
- * @param {string} props.uses            Traditional therapeutic uses
- */
 export default function EntryCard({
   nameKhmer,
   nameEnglish,
@@ -84,20 +70,10 @@ export default function EntryCard({
   compounds,
   uses,
 }) {
-
-const [isHovered, setIsHovered] = useState(false);
-   const cardStyle = {
-     ...styles.card,
-     transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
-     transition: 'transform 0.2s ease, border-color 0.2s ease',
-     borderLeftColor: isHovered ? '#C8E6A9' : styles.card.borderLeft,
-   };
+  const data = { family, description, habitat, compounds, uses };
+  
   return (
-    <article
-       style={cardStyle}
-       onMouseEnter={() => setIsHovered(true)}
-       onMouseLeave={() => setIsHovered(false)}
-     >
+    <article style={styles.card}>
       <img
         src={image}
         alt={`${nameEnglish} (${nameKhmer})`}
@@ -106,15 +82,13 @@ const [isHovered, setIsHovered] = useState(false);
       <h2 style={styles.nameKhmer}>{nameKhmer}</h2>
       <p style={styles.nameEnglish}>{nameEnglish}</p>
       <p style={styles.scientific}>{scientificName}</p>
-      {FIELDS.map(({ label, prop }) => {
-        const data = { family, description, habitat, compounds, uses };
-        return (
-          <div key={label}>
-            <p style={styles.label}>{label}</p>
-            <p style={styles.value}>{data[prop]}</p>
-          </div>
-        );
-      })}
+      
+      {FIELDS.map(({ label, prop }) => (
+        <div key={label}>
+          <p style={styles.label}>{label}</p>
+          <p style={styles.value}>{data[prop]}</p>
+        </div>
+      ))}
     </article>
   );
 }
