@@ -49,28 +49,35 @@ const styles = {
     lineHeight: 1.8,
     margin: "4px 0 0",
   },
+  list: {
+    fontSize: 16,
+    color: "#E8ECE9",
+    lineHeight: 1.8,
+    margin: "4px 0 0",
+  },
 };
 
 const FIELDS = [
   { label: "Species / Family", prop: "family" },
   { label: "Description", prop: "description" },
-  { label: "Habitat & Distribution", prop: "habitat" },
-  { label: "Active Compounds", prop: "compounds" },
-  { label: "Medicinal Uses & Indications", prop: "uses" },
+  { label: "Habitat & Distribution", prop: "location" },
+  { label: "Active Compounds", prop: "chemicalCompounds" },
+  { label: "Medicinal Uses & Indications", prop: "medicinalUses" },
 ];
 
 export default function EntryCard({
+  id,
   nameKhmer,
   nameEnglish,
   scientificName,
   family,
   image,
   description,
-  habitat,
-  compounds,
-  uses,
+  location,
+  chemicalCompounds,
+  medicinalUses,
 }) {
-  const data = { family, description, habitat, compounds, uses };
+  const data = { family, description, location, chemicalCompounds, medicinalUses };
   
   return (
     <article style={styles.card}>
@@ -83,12 +90,17 @@ export default function EntryCard({
       <p style={styles.nameEnglish}>{nameEnglish}</p>
       <p style={styles.scientific}>{scientificName}</p>
       
-      {FIELDS.map(({ label, prop }) => (
-        <div key={label}>
-          <p style={styles.label}>{label}</p>
-          <p style={styles.value}>{data[prop]}</p>
-        </div>
-      ))}
+      {FIELDS.map(({ label, prop }) => {
+        const value = data[prop];
+        return (
+          <div key={label}>
+            <p style={styles.label}>{label}</p>
+            <p style={typeof value === 'object' && value ? styles.list : styles.value}>
+              {Array.isArray(value) ? value.join(', ') : value}
+            </p>
+          </div>
+        );
+      })}
     </article>
   );
 }
