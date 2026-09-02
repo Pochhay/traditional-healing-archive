@@ -74,7 +74,7 @@ const entries = [
   },
   {
     id: "kantuer-chek",
-    nameKhmer: "កន្តือចេក, សំបូរទេស",
+    nameKhmer: "កន្ធំធេត, សំបួរេទស",
     nameEnglish: "Kantuer Chek, Sambour Tes",
     scientificName: "Leucaena glauca Willd.",
     family: "Mimosoideae",
