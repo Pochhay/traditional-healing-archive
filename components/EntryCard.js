@@ -54,6 +54,10 @@ const styles = {
     color: "#E8ECE9",
     lineHeight: 1.8,
     margin: "4px 0 0",
+    paddingLeft: 20,
+  },
+  listItem: {
+    margin: "4px 0",
   },
 };
 
@@ -63,29 +67,39 @@ const FIELDS = [
   { label: "Habitat & Distribution", prop: "location" },
   { label: "Active Compounds", prop: "chemicalCompounds" },
   { label: "Medicinal Uses & Indications", prop: "medicinalUses" },
+  { label: "Parts Used", prop: "partsUsed" },
+  { label: "Dosage", prop: "dosage" },
+  { label: "Caution", prop: "caution" },
 ];
 
-export default function EntryCard({
-  id,
-  nameKhmer,
-  nameEnglish,
-  scientificName,
-  family,
-  image,
-  description,
-  location,
-  chemicalCompounds,
-  medicinalUses,
-}) {
-  const data = { family, description, location, chemicalCompounds, medicinalUses };
+export default function EntryCard({ entry }) {
+  const {
+    id,
+    nameKhmer,
+    nameEnglish,
+    scientificName,
+    family,
+    image,
+    description,
+    location,
+    chemicalCompounds,
+    medicinalUses,
+    partsUsed,
+    dosage,
+    caution,
+  } = entry;
+
+  const data = { family, description, location, chemicalCompounds, medicinalUses, partsUsed, dosage, caution };
   
   return (
     <article style={styles.card}>
-      <img
-        src={image}
-        alt={`${nameEnglish} (${nameKhmer})`}
-        style={styles.photo}
-      />
+      {image && (
+        <img
+          src={image}
+          alt={`${nameEnglish} (${nameKhmer})`}
+          style={styles.photo}
+        />
+      )}
       <h2 style={styles.nameKhmer}>{nameKhmer}</h2>
       <p style={styles.nameEnglish}>{nameEnglish}</p>
       <p style={styles.scientific}>{scientificName}</p>
@@ -95,9 +109,11 @@ export default function EntryCard({
         return (
           <div key={label}>
             <p style={styles.label}>{label}</p>
-            <p style={typeof value === 'object' && value ? styles.list : styles.value}>
-              {Array.isArray(value) ? value.join(', ') : value}
-            </p>
+            {Array.isArray(value) ? (
+              <p style={styles.value}>{value.join(", ")}</p>
+            ) : (
+              <p style={styles.value}>{value}</p>
+            )}
           </div>
         );
       })}

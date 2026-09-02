@@ -22,7 +22,7 @@ export default function Home() {
 
       <div style={{ display: "grid", gap: 24 }}>
         {entries.map((entry) => (
-          <EntryCard key={entry.nameEnglish} {...entry} />
+          <EntryCard key={entry.id} entry={entry} />
         ))}
       </div>
 
