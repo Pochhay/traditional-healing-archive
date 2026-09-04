@@ -5,12 +5,24 @@ import collection from "../collection.config.js";
 import entries from "../data/entries.js";
 import EntryCard from "../components/EntryCard.js";
 
+const SEARCH_FIELDS = {
+  all: ["nameKhmer", "nameEnglish", "scientificName", "family", "description", "location", "partsUsed", "dosage", "caution", "chemicalCompounds", "medicinalUses"],
+  scoped: [
+    { key: "name", label: "Name", props: ["nameKhmer", "nameEnglish", "scientificName"] },
+    { key: "family", label: "Family", props: ["family"] },
+    { key: "uses", label: "Uses", props: ["medicinalUses"] },
+    { key: "compounds", label: "Compounds", props: ["chemicalCompounds"] },
+    { key: "location", label: "Location", props: ["location"] },
+  ],
+};
+
 export default function Home() {
   const [query, setQuery] = useState("");
+  const [activeFields, setActiveFields] = useState([]);
 
   const lowerQuery = query.toLowerCase().trim();
 
-  const filteredEntries = entries.filter((entry) => {
+  const filterEntries = (entry) => {
     if (!lowerQuery) return true;
 
     const matchField = (val) =>
@@ -20,23 +32,29 @@ export default function Home() {
       Array.isArray(arr) &&
       arr.some((item) => typeof item === "string" && item.toLowerCase().includes(lowerQuery));
 
-    return (
-      matchField(entry.nameKhmer) ||
-      matchField(entry.nameEnglish) ||
-      matchField(entry.scientificName) ||
-      matchField(entry.family) ||
-      matchField(entry.description) ||
-      matchField(entry.location) ||
-      matchField(entry.partsUsed) ||
-      matchField(entry.dosage) ||
-      matchArray(entry.chemicalCompounds) ||
-      matchArray(entry.medicinalUses)
-    );
-  });
+    const matchProp = (prop) =>
+      Array.isArray(entry[prop]) ? matchArray(entry[prop]) : matchField(entry[prop]);
+
+    if (activeFields.length === 0) {
+      return SEARCH_FIELDS.all.some(matchProp);
+    }
+
+    return SEARCH_FIELDS.scoped
+      .filter(({ key }) => activeFields.includes(key))
+      .some(({ props }) => props.some(matchProp));
+  };
+
+  const filteredEntries = entries.filter(filterEntries);
 
   const totalEntries = entries.length;
   const resultCount = filteredEntries.length;
   const isSearching = lowerQuery !== "";
+  const isScoped = activeFields.length > 0;
+
+  const toggleField = (key) =>
+    setActiveFields((prev) =>
+      prev.includes(key) ? prev.filter((f) => f !== key) : [...prev, key]
+    );
 
   return (
     <main style={styles.wrap}>
@@ -53,18 +71,51 @@ export default function Home() {
         <p style={styles.cardValue}>{collection.source}</p>
       </div>
 
-      <p style={styles.searchLabel}>SEARCH / ស្វែងរក</p>
+      <label style={styles.searchLabel} htmlFor="archive-search">
+        SEARCH / ស្វែងរក
+      </label>
       <input
         type="text"
+        id="archive-search"
         placeholder="Type to search name, family, uses, compounds..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         style={styles.searchInput}
       />
 
+      <p style={styles.filterLabel}>FILTER:</p>
+      <div style={styles.filterRow}>
+        <button
+          type="button"
+          style={activeFields.length === 0 ? styles.pillActive : styles.pill}
+          onClick={() => setActiveFields([])}
+        >
+          All
+        </button>
+        {SEARCH_FIELDS.scoped.map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            style={activeFields.includes(key) ? styles.pillActive : styles.pill}
+            onClick={() => toggleField(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {isSearching ? (
         <p style={styles.count}>
-          {resultCount} result{resultCount !== 1 ? "s" : ""} found for &ldquo;{query}&rdquo;
+          {resultCount} result{resultCount !== 1 ? "s" : ""}
+          {isScoped
+            ? " in " +
+              SEARCH_FIELDS.scoped
+                .filter(({ key }) => activeFields.includes(key))
+                .map(({ label }) => label)
+                .join(" / ") +
+              " found"
+            : " found"}{" "}
+          for &ldquo;{query}&rdquo;
         </p>
       ) : (
         <p style={styles.count}>entries in the archive: {totalEntries}</p>
@@ -158,6 +209,42 @@ const styles = {
     fontFamily: "inherit",
     outline: "none",
     boxSizing: "border-box",
+    marginBottom: 12,
+  },
+  filterLabel: {
+    fontFamily: "Georgia, 'Times New Roman', serif",
+    fontSize: 12,
+    color: "#86B29B",
+    marginTop: 14,
+    marginBottom: 8,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  filterRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
+  },
+  pill: {
+    padding: "6px 12px",
+    borderRadius: 999,
+    fontSize: 14,
+    backgroundColor: "#16221D",
+    border: "1px solid #2D4A3E",
+    color: "#86B29B",
+    cursor: "pointer",
+    fontFamily: "inherit",
+  },
+  pillActive: {
+    padding: "6px 12px",
+    borderRadius: 999,
+    fontSize: 14,
+    backgroundColor: "#2D4A3E",
+    border: "1px solid #86B29B",
+    color: "#C8E6A9",
+    cursor: "pointer",
+    fontFamily: "inherit",
   },
   count: {
     fontFamily: "Georgia, 'Times New Roman', serif",

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const styles = {
   card: {
@@ -49,16 +49,6 @@ const styles = {
     lineHeight: 1.8,
     margin: "4px 0 0",
   },
-  list: {
-    fontSize: 16,
-    color: "#E8ECE9",
-    lineHeight: 1.8,
-    margin: "4px 0 0",
-    paddingLeft: 20,
-  },
-  listItem: {
-    margin: "4px 0",
-  },
 };
 
 const FIELDS = [
@@ -72,52 +62,38 @@ const FIELDS = [
   { label: "Caution", prop: "caution" },
 ];
 
-export default function EntryCard({ entry }) {
-  const {
-    id,
-    nameKhmer,
-    nameEnglish,
-    scientificName,
-    family,
-    image,
-    description,
-    location,
-    chemicalCompounds,
-    medicinalUses,
-    partsUsed,
-    dosage,
-    caution,
-  } = entry;
+function hasContent(value) {
+  if (Array.isArray(value)) return value.length > 0;
+  return typeof value === "string" && value.trim().length > 0;
+}
 
-  const data = { family, description, location, chemicalCompounds, medicinalUses, partsUsed, dosage, caution };
-  
+export default function EntryCard({ entry }) {
   return (
     <article style={styles.card}>
-      {image && (
+      {entry.image && (
         <img
-          src={image}
-          alt={`${nameEnglish} (${nameKhmer})`}
+          src={entry.image}
+          alt={`${entry.nameEnglish} (${entry.nameKhmer})`}
           style={styles.photo}
         />
       )}
-      <h2 style={styles.nameKhmer}>{nameKhmer}</h2>
-      <p style={styles.nameEnglish}>{nameEnglish}</p>
-      <p style={styles.scientific}>{scientificName}</p>
-      
+      <h2 style={styles.nameKhmer}>{entry.nameKhmer}</h2>
+      <p style={styles.nameEnglish}>{entry.nameEnglish}</p>
+      <p style={styles.scientific}>{entry.scientificName}</p>
+
       {FIELDS.map(({ label, prop }) => {
-        const value = data[prop];
+        const value = entry[prop];
+        if (!hasContent(value)) return null;
+
         return (
           <div key={label}>
             <p style={styles.label}>{label}</p>
-            {Array.isArray(value) ? (
-              <p style={styles.value}>{value.join(", ")}</p>
-            ) : (
-              <p style={styles.value}>{value}</p>
-            )}
+            <p style={styles.value}>
+              {Array.isArray(value) ? value.join(", ") : value}
+            </p>
           </div>
         );
       })}
     </article>
   );
 }
-
