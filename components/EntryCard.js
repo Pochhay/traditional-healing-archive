@@ -37,11 +37,16 @@ const styles = {
 };
 
 export default function EntryCard({ entry }) {
-  const { id, family, image, nameEnglish, nameKhmer, location } = entry;
+  const { id, family, image, nameEnglish, nameKhmer, location, contributor = "Pochhay, ENG" } = entry;
   return (
     <article style={styles.card}>
       <div style={styles.ribbon}>
-        <span style={styles.accession}>Accession: KH-MED-{id.toUpperCase()}</span>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
+          <span style={styles.accession}>Accession: KH-MED-{id.toUpperCase()}</span>
+          <span style={{ fontSize: 11, color: "#86B29B", letterSpacing: 0.5 }}>
+            By: {contributor}
+          </span>
+        </div>
         <span style={styles.familyBadge}>Family: {family}</span>
       </div>
       <div style={styles.body}>

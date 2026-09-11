@@ -1,6 +1,7 @@
 const entries = [
   {
     id: "hophead-philippine-violet",
+    contributor: "Pochhay, ENG",
     nameKhmer: "ម្ជុលមាស, ម្ជុលពេជ្រ",
     nameEnglish: "Mjul Meas, Mjul Pech",
     scientificName: "Barleria lupulina Lindl.",
@@ -28,6 +29,7 @@ const entries = [
   },
   {
     id: "kbal-ruy",
+    contributor: "Pochhay, ENG",
     nameKhmer: "ក្បាលរុយ",
     nameEnglish: "Kbal Ruy",
     scientificName: "Vernonia cinerea Less.",
@@ -49,6 +51,7 @@ const entries = [
   },
     {
     id: "kathang-hae",
+    contributor: "Pochhay, ENG",
     nameKhmer: "កន្ធាំងហែរ",
     nameEnglish: "Tomentose Knotweed",
     scientificName: "Polygonum tomentosum Willd.",
@@ -74,6 +77,7 @@ const entries = [
   },
   {
     id: "kantuer-chek",
+    contributor: "Pochhay, ENG",
     nameKhmer: "កន្ធំធេត, សំបួរេទស",
     nameEnglish: "Kantuer Chek, Sambour Tes",
     scientificName: "Leucaena glauca Willd.",
@@ -93,6 +97,7 @@ const entries = [
   },
   {
     id: "vernonia-elliptica",
+    contributor: "Pochhay, ENG",
     nameKhmer: "រលឹកន្នีតចក",
     nameEnglish: "Roleuk Neet Chak",
     scientificName: "Vernonia elliptica DC.",
@@ -112,6 +117,7 @@ const entries = [
   },
   {
     id: "kalanchoe-pinnata",
+    contributor: "Pochhay, ENG",
     nameKhmer: "កបិលភក្ត្ត",
     nameEnglish: "Kobel Pheak",
     scientificName: "Bryophyllum pinnatum Kurz",
@@ -131,6 +137,7 @@ const entries = [
   },
   {
     id: "leea-rubra",
+    contributor: "Pochhay, ENG",
     nameKhmer: "ក្ដាំងបាយ",
     nameEnglish: "Kdang Bay",
     scientificName: "Leea rubra Blume",
@@ -151,6 +158,7 @@ const entries = [
   },
   {
     id: "crinum-asiaticum",
+    contributor: "Pochhay, ENG",
     nameKhmer: "កំភ្លឹង",
     nameEnglish: "Crinum asiaticum",
     scientificName: "Crinum asiaticum L.",
