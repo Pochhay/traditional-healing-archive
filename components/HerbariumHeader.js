@@ -1,7 +1,12 @@
 import collection from "../collection.config.js";
+import AuthNav from "./AuthNav.js";
 
 const styles = {
   header: { padding: "40px 0 20px", display: "flex", flexDirection: "column", gap: 16 },
+  topRow: {
+    display: "flex", justifyContent: "space-between", alignItems: "center",
+    gap: 12, flexWrap: "wrap",
+  },
   badgeRow: {
     display: "inline-flex", alignItems: "center", gap: 8,
     backgroundColor: "#232C27", padding: "4px 12px", borderRadius: 4, width: "fit-content",
@@ -37,9 +42,12 @@ const styles = {
 export default function HerbariumHeader() {
   return (
     <header style={styles.header}>
-      <div style={styles.badgeRow}>
-        <span style={styles.pulseDot} />
-        <span style={styles.badgeText}>National Herbarium Digital Repository</span>
+      <div style={styles.topRow}>
+        <div style={styles.badgeRow}>
+          <span style={styles.pulseDot} />
+          <span style={styles.badgeText}>National Herbarium Digital Repository</span>
+        </div>
+        <AuthNav />
       </div>
       <div>
         <h1 style={styles.title}>{collection.name}</h1>
