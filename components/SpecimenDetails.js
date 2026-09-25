@@ -32,7 +32,7 @@ export default function SpecimenDetails({ entry }) {
         <div>
           <p style={styles.label}>Active Compounds</p>
           <div style={styles.tagGroup}>
-            {chemicalCompounds.map((c) => <span key={c} style={styles.tag}>{c}</span>)}
+            {chemicalCompounds.map((c, i) => <span key={`${c}-${i}`} style={styles.tag}>{c}</span>)}
           </div>
         </div>
       )}
