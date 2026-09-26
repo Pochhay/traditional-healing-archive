@@ -20,7 +20,6 @@ function mapEntry(row) {
     caution: row.caution,
     image: row.photo_url,
     description: row.description,
-    partsUsed: row.parts_used,
     dosage: row.dosage,
     medicinalUses: row.medicinal_uses ? row.medicinal_uses.split("\n").filter(Boolean) : [],
     chemicalCompounds: row.chemical_compounds ? row.chemical_compounds.split(",").map((c) => c.trim()).filter(Boolean) : [],
@@ -68,7 +67,7 @@ export default function Home() {
     if (activeField === "uses") return matchArr(entry.medicinalUses);
     if (activeField === "compounds") return matchArr(entry.chemicalCompounds);
     if (activeField === "location") return match(entry.location);
-    const fields = ["nameKhmer", "nameEnglish", "scientificName", "family", "description", "location", "partsUsed", "dosage", "caution"];
+    const fields = ["nameKhmer", "nameEnglish", "scientificName", "family", "description", "location", "dosage", "caution"];
     return fields.some((f) => match(entry[f])) || matchArr(entry.chemicalCompounds) || matchArr(entry.medicinalUses);
   });
 

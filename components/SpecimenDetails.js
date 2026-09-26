@@ -19,7 +19,7 @@ const styles = {
 };
 
 export default function SpecimenDetails({ entry }) {
-  const { nameKhmer, nameEnglish, scientificName, description, chemicalCompounds, medicinalUses, partsUsed, dosage, caution } = entry;
+  const { nameKhmer, nameEnglish, scientificName, description, chemicalCompounds, medicinalUses, dosage, caution } = entry;
   return (
     <div style={styles.wrap}>
       <div style={styles.header}>
@@ -44,10 +44,9 @@ export default function SpecimenDetails({ entry }) {
           </ul>
         </div>
       )}
-      {(partsUsed || dosage) && (
+      {dosage && (
         <div style={{ fontSize: 12.5, color: "#9EB3A6", lineHeight: 1.5 }}>
-          {partsUsed && <div><strong style={{ color: "#DBE5DE" }}>Parts Used:</strong> {partsUsed}</div>}
-          {dosage && <div><strong style={{ color: "#DBE5DE" }}>Dosage:</strong> {dosage}</div>}
+          <div><strong style={{ color: "#DBE5DE" }}>Dosage:</strong> {dosage}</div>
         </div>
       )}
       {caution && <div style={styles.caution}><strong>Caution:</strong> {caution}</div>}
