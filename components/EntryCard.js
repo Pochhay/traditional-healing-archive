@@ -37,7 +37,7 @@ const styles = {
   },
 };
 
-export default function EntryCard({ entry, user }) {
+export default function EntryCard({ entry, user, onDelete }) {
   const { id, family, image, nameEnglish, nameKhmer, location, owner, contributor = "Pochhay, ENG" } = entry;
   const isOwner = user && user.id === owner;
   return (
@@ -50,7 +50,7 @@ export default function EntryCard({ entry, user }) {
           </span>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
-          {isOwner && <EntryActions entry={entry} />}
+          {isOwner && <EntryActions entry={entry} onDelete={onDelete} />}
           <span style={styles.familyBadge}>Family: {family}</span>
         </div>
       </div>

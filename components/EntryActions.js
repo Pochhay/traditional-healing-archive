@@ -1,8 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "../utils/supabase/client";
+import ConfirmModal from "./ConfirmModal.js";
 
 const supabase = createClient();
 
@@ -18,14 +19,17 @@ const styles = {
   },
 };
 
-export default function EntryActions({ entry }) {
-  const router = useRouter();
+export default function EntryActions({ entry, onDelete }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   async function handleDelete() {
-    if (!window.confirm("Are you sure you want to delete this entry?")) return;
+    setDeleting(true);
     const { data, error } = await supabase.from("entries").delete().eq("id", entry.id).select();
+    setDeleting(false);
+    setConfirmOpen(false);
     if (!error && data && data.length > 0) {
-      router.refresh();
+      onDelete(entry.id);
     } else {
       console.error("Delete failed or refused by policy:", error);
       window.alert("That change wasn't saved");
@@ -35,7 +39,14 @@ export default function EntryActions({ entry }) {
   return (
     <div style={styles.wrap}>
       <Link href={`/contribute?id=${entry.id}`} style={styles.editLink}>Edit</Link>
-      <button type="button" onClick={handleDelete} style={styles.delBtn}>Delete</button>
+      <button type="button" onClick={() => setConfirmOpen(true)} style={styles.delBtn}>Delete</button>
+      <ConfirmModal
+        open={confirmOpen}
+        message="Are you sure you want to delete this entry? This cannot be undone."
+        confirmLabel={deleting ? "Deleting…" : "Delete"}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

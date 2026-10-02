@@ -53,6 +53,8 @@ export default function Home() {
   const [activeField, setActiveField] = useState("all");
   const [user, setUser] = useState(null);
 
+  const removeEntry = (id) => setEntries((prev) => prev.filter((e) => e.id !== id));
+
   useEffect(() => {
     supabase.from("entries").select("*").order("created_at", { ascending: false }).then(({ data, error: fetchError }) => {
       if (fetchError) return setError("Could not load the archive. Please try again later.");
@@ -97,7 +99,7 @@ export default function Home() {
             <span style={{ color: "#86B29B" }}>Loading specimen records from the archive…</span>
           </div>
         ) : filtered.length > 0 ? (
-          filtered.map((entry) => <EntryCard key={entry.id} entry={entry} user={user} />)
+          filtered.map((entry) => <EntryCard key={entry.id} entry={entry} user={user} onDelete={removeEntry} />)
         ) : (
           <div style={styles.empty}>
             <span style={{ fontSize: 18, color: "#B2D095" }}>រកមិនឃើញរុក្ខជាតិឱសថទេ</span>

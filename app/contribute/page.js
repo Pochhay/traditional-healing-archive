@@ -4,12 +4,30 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
+import TagInput from "../../components/TagInput.js";
 
 const supabase = createClient();
 
 const MAX_PHOTO_BYTES = 5242880; // 5 MiB
 const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "gif"];
 const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+// crypto.randomUUID() needs a secure context; fall back to getRandomValues/Math.random.
+function randomId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  const bytes = new Uint8Array(16);
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    crypto.getRandomValues(bytes);
+  } else {
+    for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256);
+  }
+  bytes[6] = (bytes[6] & 0x0f) | 0x40; // v4 version bits
+  bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant bits
+  const h = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
 const TRADITIONAL_FAMILIES = [
   "Compositae", "Leguminosae", "Umbelliferae", "Cruciferae",
   "Labiatae", "Guttiferae", "Palmae", "Gramineae",
@@ -125,18 +143,16 @@ function validateHabitat(raw) {
   return null;
 }
 
-function validateCompounds(raw, unstudied) {
+function validateCompounds(tags, unstudied) {
   if (unstudied) {
-    if (normalizeText(raw)) return 'Cannot provide compounds and tick "unstudied" together.';
+    if (Array.isArray(tags) && tags.length > 0) return 'Cannot provide compounds and tick "unstudied" together.';
     return null;
   }
-  const { value, error } = cleanMulti(raw);
-  if (error) return error;
-  if (!value) return 'Provide compounds, or tick "not yet studied".';
-  const tags = value.split(/[;\n]/).map((t) => t.trim()).filter(Boolean);
-  if (tags.length > 50) return "At most 50 compounds may be listed.";
+  if (!Array.isArray(tags) || tags.length === 0) return 'Provide compounds, or tick "not yet studied".';
+  if (tags.length > 100) return "At most 100 compounds may be listed.";
   const seen = new Set();
-  for (const tag of tags) {
+  for (const raw of tags) {
+    const tag = normalizeText(String(raw));
     if (codepoints(tag) < 2 || codepoints(tag) > 60)
       return `Each compound must be 2–60 characters: "${tag}".`;
     if (tag.split(/\s+/).length > 6) return `Each compound may have at most 6 words: "${tag}".`;
@@ -233,7 +249,7 @@ function ContributeForm() {
   const [user, setUser] = useState(undefined);
   const [form, setForm] = useState({
     nameKhmer: "", title: "", scientificName: "", family: "", description: "",
-    habitat: "", medicinalUses: "", chemicalCompounds: "", dosage: "", caution: "",
+    habitat: "", medicinalUses: "", chemicalCompounds: [], dosage: "", caution: "",
     compoundsUnstudied: false, cautionNoneKnown: false,
   });
   const [photo, setPhoto] = useState(null);
@@ -263,7 +279,9 @@ function ContributeForm() {
         description: data.description ?? "",
         habitat: data.habitat ?? "",
         medicinalUses: data.medicinal_uses ?? "",
-        chemicalCompounds: data.chemical_compounds ?? "",
+        chemicalCompounds: data.chemical_compounds
+          ? data.chemical_compounds.split(/[;\n]/).map((t) => t.trim()).filter(Boolean)
+          : [],
         dosage: data.dosage ?? "",
         caution: data.caution ?? "",
         compoundsUnstudied: data.chemical_compounds == null,
@@ -318,8 +336,7 @@ function ContributeForm() {
       medicinal_uses: normalizeText(form.medicinalUses),
       chemical_compounds: form.compoundsUnstudied
         ? null
-        : normalizeText(form.chemicalCompounds)
-            .split(/[;\n]/).map((t) => t.trim()).filter(Boolean).join("; ") || null,
+        : form.chemicalCompounds.join("; ") || null,
       dosage: normalizeText(form.dosage) || null,
       caution: form.cautionNoneKnown ? null : normalizeText(form.caution),
     };
@@ -328,7 +345,7 @@ function ContributeForm() {
     try {
       if (photo) {
         const ext = photo.name.split(".").pop().toLowerCase();
-        const path = `${u.id}/${crypto.randomUUID()}.${ext}`;
+        const path = `${u.id}/${randomId()}.${ext}`;
         const { error: uploadErr } = await supabase.storage.from("photos").upload(path, photo);
         if (uploadErr) throw uploadErr;
         payload.photo_url = supabase.storage.from("photos").getPublicUrl(path).data.publicUrl;
@@ -450,15 +467,17 @@ function ContributeForm() {
               onBlur={() => validateField("medicinalUses")} />
           ))}
 
-          {fld("chemicalCompounds", "Chemical compounds *", errors.chemicalCompounds, (id) => (
-            <textarea id={id} style={styles.textarea}
-              value={form.chemicalCompounds} disabled={form.compoundsUnstudied}
-              onChange={(e) => setField("chemicalCompounds", e.target.value)}
-              onBlur={() => validateField("chemicalCompounds")} />
-          ))}
+          <label style={styles.label}>Chemical compounds *  (press Enter to add, 100 max)</label>
+          <TagInput
+            value={form.chemicalCompounds}
+            disabled={form.compoundsUnstudied}
+            maxTags={100}
+            onChange={(tags) => { setField("chemicalCompounds", tags); setErrors((er) => ({ ...er, chemicalCompounds: null })); }}
+          />
+          {errors.chemicalCompounds && <p style={styles.error}>{errors.chemicalCompounds}</p>}
           <label style={styles.checkboxRow}>
             <input type="checkbox" checked={form.compoundsUnstudied}
-              onChange={(e) => setForm((f) => ({ ...f, compoundsUnstudied: e.target.checked, chemicalCompounds: e.target.checked ? "" : f.chemicalCompounds }))} />
+              onChange={(e) => setForm((f) => ({ ...f, compoundsUnstudied: e.target.checked, chemicalCompounds: e.target.checked ? [] : f.chemicalCompounds }))} />
             Phytochemicals not yet formally studied / មិនទាន់មានការស្រាវជ្រាវគីមី
           </label>
 
