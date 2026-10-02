@@ -1,5 +1,6 @@
 import React from "react";
 import SpecimenDetails from "./SpecimenDetails.js";
+import EntryActions from "./EntryActions.js";
 
 const styles = {
   card: {
@@ -36,8 +37,9 @@ const styles = {
   },
 };
 
-export default function EntryCard({ entry }) {
-  const { id, family, image, nameEnglish, nameKhmer, location, contributor = "Pochhay, ENG" } = entry;
+export default function EntryCard({ entry, user }) {
+  const { id, family, image, nameEnglish, nameKhmer, location, owner, contributor = "Pochhay, ENG" } = entry;
+  const isOwner = user && user.id === owner;
   return (
     <article style={styles.card}>
       <div style={styles.ribbon}>
@@ -47,7 +49,10 @@ export default function EntryCard({ entry }) {
             By: {contributor}
           </span>
         </div>
-        <span style={styles.familyBadge}>Family: {family}</span>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
+          {isOwner && <EntryActions entry={entry} />}
+          <span style={styles.familyBadge}>Family: {family}</span>
+        </div>
       </div>
       <div style={styles.body}>
         <div style={styles.photoPane}>

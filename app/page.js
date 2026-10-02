@@ -12,6 +12,7 @@ const supabase = createClient();
 function mapEntry(row) {
   return {
     id: row.id,
+    owner: row.owner,
     nameEnglish: row.title,
     nameKhmer: row.name_khmer,
     scientificName: row.scientific_name,
@@ -50,12 +51,14 @@ export default function Home() {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [activeField, setActiveField] = useState("all");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     supabase.from("entries").select("*").order("created_at", { ascending: false }).then(({ data, error: fetchError }) => {
       if (fetchError) return setError("Could not load the archive. Please try again later.");
       setEntries(data.map(mapEntry));
     });
+    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
   }, []);
   const q = query.toLowerCase().trim();
   const filtered = (entries ?? []).filter((entry) => {
@@ -94,7 +97,7 @@ export default function Home() {
             <span style={{ color: "#86B29B" }}>Loading specimen records from the archive…</span>
           </div>
         ) : filtered.length > 0 ? (
-          filtered.map((entry) => <EntryCard key={entry.id} entry={entry} />)
+          filtered.map((entry) => <EntryCard key={entry.id} entry={entry} user={user} />)
         ) : (
           <div style={styles.empty}>
             <span style={{ fontSize: 18, color: "#B2D095" }}>រកមិនឃើញរុក្ខជាតិឱសថទេ</span>

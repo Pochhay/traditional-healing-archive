@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
 
@@ -224,8 +224,11 @@ const VALIDATORS = {
   caution: (f) => validateCaution(f.caution, f.cautionNoneKnown),
 };
 
-export default function ContributePage() {
+function ContributeForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("id");
+  const isEdit = Boolean(editId);
   // undefined = loading, null = signed out, object = signed in.
   const [user, setUser] = useState(undefined);
   const [form, setForm] = useState({
@@ -237,10 +240,38 @@ export default function ContributePage() {
   const [errors, setErrors] = useState({});
   const [banner, setBanner] = useState("");
   const [busy, setBusy] = useState(null); // null | "photo" | "save"
+  const [loadingEntry, setLoadingEntry] = useState(isEdit);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
   }, []);
+
+  // Pre-fill the form when editing an existing entry.
+  useEffect(() => {
+    if (!editId) return;
+    supabase.from("entries").select("*").eq("id", editId).single().then(({ data, error }) => {
+      if (error || !data) {
+        setLoadingEntry(false);
+        setBanner("Could not load this entry for editing.");
+        return;
+      }
+      setForm({
+        nameKhmer: data.name_khmer ?? "",
+        title: data.title ?? "",
+        scientificName: data.scientific_name ?? "",
+        family: data.family ?? "",
+        description: data.description ?? "",
+        habitat: data.habitat ?? "",
+        medicinalUses: data.medicinal_uses ?? "",
+        chemicalCompounds: data.chemical_compounds ?? "",
+        dosage: data.dosage ?? "",
+        caution: data.caution ?? "",
+        compoundsUnstudied: data.chemical_compounds == null,
+        cautionNoneKnown: data.caution == null,
+      });
+      setLoadingEntry(false);
+    });
+  }, [editId]);
 
   const setField = (name, value) => setForm((f) => ({ ...f, [name]: value }));
 
@@ -254,8 +285,10 @@ export default function ContributePage() {
       const msg = VALIDATORS[key](form);
       if (msg) errs[key] = msg;
     }
-    const photoMsg = validatePhoto(photo);
-    if (photoMsg) errs.photo = photoMsg;
+    if (photo || !isEdit) {
+      const photoMsg = validatePhoto(photo);
+      if (photoMsg) errs.photo = photoMsg;
+    }
     return errs;
   }
 
@@ -275,34 +308,49 @@ export default function ContributePage() {
       return;
     }
 
-    setBusy("photo");
-    try {
-      const ext = photo.name.split(".").pop().toLowerCase();
-      const path = `${u.id}/${crypto.randomUUID()}.${ext}`;
-      const { error: uploadErr } = await supabase.storage.from("photos").upload(path, photo);
-      if (uploadErr) throw uploadErr;
-      const photoUrl = supabase.storage.from("photos").getPublicUrl(path).data.publicUrl;
-
-      setBusy("save");
-      const compounds = form.compoundsUnstudied
+    const payload = {
+      title: normalizeText(form.title),
+      name_khmer: normalizeText(form.nameKhmer),
+      scientific_name: normalizeText(form.scientificName),
+      family: normalizeText(form.family),
+      description: normalizeText(form.description),
+      habitat: normalizeText(form.habitat),
+      medicinal_uses: normalizeText(form.medicinalUses),
+      chemical_compounds: form.compoundsUnstudied
         ? null
         : normalizeText(form.chemicalCompounds)
-            .split(/[;\n]/).map((t) => t.trim()).filter(Boolean).join("; ");
+            .split(/[;\n]/).map((t) => t.trim()).filter(Boolean).join("; ") || null,
+      dosage: normalizeText(form.dosage) || null,
+      caution: form.cautionNoneKnown ? null : normalizeText(form.caution),
+    };
 
-      const { error: insertErr } = await supabase.from("entries").insert({
-        owner: u.id,
-        title: normalizeText(form.title),
-        name_khmer: normalizeText(form.nameKhmer),
-        scientific_name: normalizeText(form.scientificName),
-        family: normalizeText(form.family),
-        description: normalizeText(form.description),
-        habitat: normalizeText(form.habitat),
-        medicinal_uses: normalizeText(form.medicinalUses),
-        chemical_compounds: compounds || null,
-        dosage: normalizeText(form.dosage) || null,
-        caution: form.cautionNoneKnown ? null : normalizeText(form.caution),
-        photo_url: photoUrl,
-      });
+    setBusy("photo");
+    try {
+      if (photo) {
+        const ext = photo.name.split(".").pop().toLowerCase();
+        const path = `${u.id}/${crypto.randomUUID()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from("photos").upload(path, photo);
+        if (uploadErr) throw uploadErr;
+        payload.photo_url = supabase.storage.from("photos").getPublicUrl(path).data.publicUrl;
+      }
+
+      setBusy("save");
+
+      if (isEdit) {
+        const { data, error: updateErr } = await supabase.from("entries")
+          .update(payload).eq("id", editId).select();
+        if (!updateErr && data && data.length > 0) {
+          router.push("/");
+          router.refresh();
+          return;
+        }
+        console.error("Update failed or refused by policy:", updateErr);
+        setBanner("That change wasn't saved");
+        setBusy(null);
+        return;
+      }
+
+      const { error: insertErr } = await supabase.from("entries").insert({ ...payload, owner: u.id });
       if (insertErr) throw insertErr;
 
       router.push("/");
@@ -334,6 +382,16 @@ export default function ContributePage() {
     );
   }
 
+  if (loadingEntry) {
+    return (
+      <main style={styles.page}>
+        <div style={styles.card}>
+          <p style={{ color: "#86B29B", margin: 0 }}>Loading entry…</p>
+        </div>
+      </main>
+    );
+  }
+
   const fld = (id, label, err, el) => (
     <>
       <label style={styles.label} htmlFor={id}>{label}</label>
@@ -345,8 +403,8 @@ export default function ContributePage() {
   return (
     <main style={styles.page}>
       <div style={styles.card}>
-        <h1 style={styles.title}>Contribute a Plant</h1>
-        <p style={styles.subtitle}>បញ្ចូលរុក្ខជាតិឱសថថ្មី</p>
+        <h1 style={styles.title}>{isEdit ? "Edit Plant Entry" : "Contribute a Plant"}</h1>
+        <p style={styles.subtitle}>{isEdit ? "កែប្រែព័ត៌មានរុក្ខជាតិ" : "បញ្ចូលរុក្ខជាតិឱសថថ្មី"}</p>
         {banner && <p style={styles.banner}>{banner}</p>}
 
         <form onSubmit={handleSubmit} noValidate>
@@ -422,7 +480,7 @@ export default function ContributePage() {
             No specific contraindications recorded / មិនមានការកត់ត្រាការហាមឃាត់ជាក់លាក់
           </label>
 
-          <label style={styles.label} htmlFor="photo">Photo *  (.jpg, .png, .webp, .gif — 5 MiB max)</label>
+          <label style={styles.label} htmlFor="photo">Photo {isEdit ? "(optional)" : "*"}  (.jpg, .png, .webp, .gif — 5 MiB max)</label>
           <input id="photo" type="file" accept=".jpg,.jpeg,.png,.webp,.gif"
             onChange={(e) => { setPhoto(e.target.files[0] || null); setErrors((er) => ({ ...er, photo: null })); }} />
           {errors.photo && <p style={styles.error}>{errors.photo}</p>}
@@ -434,5 +492,13 @@ export default function ContributePage() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function ContributePage() {
+  return (
+    <Suspense fallback={<main style={styles.page} />}>
+      <ContributeForm />
+    </Suspense>
   );
 }
