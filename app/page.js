@@ -13,6 +13,7 @@ function mapEntry(row) {
   return {
     id: row.id,
     owner: row.owner,
+    contributor: row.contributor,
     nameEnglish: row.title,
     nameKhmer: row.name_khmer,
     scientificName: row.scientific_name,

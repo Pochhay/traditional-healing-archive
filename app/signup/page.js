@@ -31,6 +31,7 @@ const styles = {
 
 export default function SignupPage() {
   const router = useRouter();
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -40,7 +41,11 @@ export default function SignupPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const { error: signUpError } = await supabase.auth.signUp({ email, password });
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { username: username.trim() } },
+    });
     setLoading(false);
     // Generic message only — no enumeration, no Supabase error details surfaced.
     if (signUpError) return setError("Could not complete sign up. Please check your details and try again.");
@@ -54,6 +59,8 @@ export default function SignupPage() {
         <h1 style={styles.title}>Create account</h1>
         <p style={styles.subtitle}>បង្កើតគណនីថ្មី</p>
         {error && <p style={styles.error}>{error}</p>}
+        <label style={styles.label} htmlFor="username">Username</label>
+        <input id="username" type="text" style={styles.input} value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" minLength={2} maxLength={30} required />
         <label style={styles.label} htmlFor="email">Email</label>
         <input id="email" type="email" style={styles.input} value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
         <label style={styles.label} htmlFor="password">Password</label>

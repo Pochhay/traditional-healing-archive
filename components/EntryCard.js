@@ -1,6 +1,7 @@
 import React from "react";
 import SpecimenDetails from "./SpecimenDetails.js";
 import EntryActions from "./EntryActions.js";
+import collection from "../collection.config.js";
 
 const styles = {
   card: {
@@ -38,7 +39,7 @@ const styles = {
 };
 
 export default function EntryCard({ entry, user, onDelete }) {
-  const { id, family, image, nameEnglish, nameKhmer, location, owner, contributor = "Pochhay, ENG" } = entry;
+  const { id, family, image, nameEnglish, nameKhmer, location, owner, contributor = collection.curator } = entry;
   const isOwner = user && user.id === owner;
   return (
     <article style={styles.card}>

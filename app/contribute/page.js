@@ -339,6 +339,7 @@ function ContributeForm() {
         : form.chemicalCompounds.join("; ") || null,
       dosage: normalizeText(form.dosage) || null,
       caution: form.cautionNoneKnown ? null : normalizeText(form.caution),
+      contributor: u.user_metadata?.username || u.email || "Anonymous",
     };
 
     setBusy("photo");
