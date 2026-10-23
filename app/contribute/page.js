@@ -255,6 +255,7 @@ function ContributeForm() {
   const [photo, setPhoto] = useState(null);
   const [errors, setErrors] = useState({});
   const [banner, setBanner] = useState("");
+  const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(null); // null | "photo" | "save"
   const [loadingEntry, setLoadingEntry] = useState(isEdit);
 
@@ -355,8 +356,11 @@ function ContributeForm() {
       setBusy("save");
 
       if (isEdit) {
+        const { data: reviewerFlag, error: rpcErr } = await supabase.rpc("is_reviewer");
+        const isReviewer = !rpcErr && reviewerFlag === true;
+        const updatePayload = isReviewer ? payload : { ...payload, status: "pending" };
         const { data, error: updateErr } = await supabase.from("entries")
-          .update(payload).eq("id", editId).select();
+          .update(updatePayload).eq("id", editId).select();
         if (!updateErr && data && data.length > 0) {
           router.push("/");
           router.refresh();
@@ -371,8 +375,10 @@ function ContributeForm() {
       const { error: insertErr } = await supabase.from("entries").insert({ ...payload, owner: u.id });
       if (insertErr) throw insertErr;
 
-      router.push("/");
-      router.refresh();
+      // Requirement 2: show the review-waiting message instead of redirecting.
+      // Do not send a status from the form; the database default sets it to pending.
+      setSubmitted(true);
+      setBusy(null);
     } catch (err) {
       console.error(err); // log real error, never surface it to the user
       setBanner("Something went wrong. Please try again.");
@@ -405,6 +411,26 @@ function ContributeForm() {
       <main style={styles.page}>
         <div style={styles.card}>
           <p style={{ color: "#86B29B", margin: 0 }}>Loading entry…</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (submitted) {
+    return (
+      <main style={styles.page}>
+        <div style={styles.card}>
+          <h1 style={styles.title}>Entry submitted</h1>
+          <p style={{ ...styles.subtitle, lineHeight: 1.8 }}>
+            Your entry has been submitted and is waiting for review before publication.
+            <br />
+            ការបញ្ចូលព័ត៌មានរបស់អ្នកត្រូវបានបញ្ជូនរួចរាល់ ហើយកំពុងរង់ចាំការពិនិត្យមុននឹងផ្សព្វផ្សាយ។
+          </p>
+          <p style={{ margin: 0 }}>
+            <Link href="/" style={styles.link}>← Back to Archive</Link>
+            {" · "}
+            <Link href="/my-entries" style={styles.link}>My entries</Link>
+          </p>
         </div>
       </main>
     );

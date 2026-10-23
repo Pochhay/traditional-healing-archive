@@ -57,7 +57,7 @@ export default function Home() {
   const removeEntry = (id) => setEntries((prev) => prev.filter((e) => e.id !== id));
 
   useEffect(() => {
-    supabase.from("entries").select("*").order("created_at", { ascending: false }).then(({ data, error: fetchError }) => {
+    supabase.from("entries").select("*").eq("status", "published").order("created_at", { ascending: false }).then(({ data, error: fetchError }) => {
       if (fetchError) return setError("Could not load the archive. Please try again later.");
       setEntries(data.map(mapEntry));
     });

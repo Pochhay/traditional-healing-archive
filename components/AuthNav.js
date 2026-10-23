@@ -58,6 +58,7 @@ export default function AuthNav() {
       {email ? (
         <>
           <Link href="/contribute" {...hoverProps("contribute", styles.chipPrimary)}>+ Contribute</Link>
+          <Link href="/my-entries" {...hoverProps("myentries", styles.chip)}>My entries</Link>
           <span style={styles.email}>{email}</span>
           <button type="button" onClick={handleLogout} {...hoverProps("logout", styles.button)}>Log out</button>
         </>
