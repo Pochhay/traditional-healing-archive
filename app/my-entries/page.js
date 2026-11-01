@@ -26,18 +26,21 @@ const styles = {
 export default function MyEntriesPage() {
   const [entries, setEntries] = useState(null); // null = loading
   const [signedOut, setSignedOut] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
       const u = data.user;
       if (!u) return setSignedOut(true);
-      // RLS restricts reads; filter by owner explicitly as required.
       supabase.from("entries")
         .select("id, title, scientific_name, status")
         .eq("owner", u.id)
         .order("created_at", { ascending: false })
-        .then(({ data: rows }) => setEntries(rows ?? []));
+        .then(({ data: rows, error: fetchError }) => {
+          // A silent failure here would falsely show "no entries".
+          if (fetchError) { console.error(fetchError); setError(true); } else { setEntries(rows ?? []); }
+        });
     });
   }, []);
 
@@ -48,15 +51,17 @@ export default function MyEntriesPage() {
         <p style={styles.subtitle}>រុក្ខជាតិរបស់ខ្ញុំ</p>
         {signedOut ? (
           <p style={styles.note}>
-            You must be signed in to view your entries.{" "}
-            <Link href="/login" style={styles.link}>Sign in</Link>
+            You must be signed in to view your entries. / សូមចូលគណនីដើម្បីមើលព័ត៌មានរបស់អ្នក។{" "}
+            <Link href="/login" style={styles.link}>Sign in / ចូលគណនី</Link>
           </p>
+        ) : error ? (
+          <p style={styles.note}>Could not load your entries. Please try again later. / មិនអាចទាញយកព័ត៌មានរបស់អ្នកបានទេ។ សូមព្យាយាមម្តងទៀត។</p>
         ) : entries === null ? (
-          <p style={styles.note}>Loading…</p>
+          <p style={styles.note}>Loading records… / កំពុងផ្ទុកព័ត៌មាន…</p>
         ) : entries.length === 0 ? (
           <p style={styles.note}>
-            You have not submitted any entries yet.{" "}
-            <Link href="/contribute" style={styles.link}>+ Contribute</Link>
+            You have not submitted any entries yet. / អ្នកមិនទាន់បានបញ្ចូលព័ត៌មាននៅឡើយទេ។{" "}
+            <Link href="/contribute" style={styles.link}>+ Contribute / + បញ្ចូលថ្មី</Link>
           </p>
         ) : (
           entries.map((entry) => (
