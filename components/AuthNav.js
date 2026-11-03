@@ -30,10 +30,12 @@ export default function AuthNav() {
   const router = useRouter();
   // undefined = still checking, null = logged out, string = logged in.
   const [email, setEmail] = useState(undefined);
+  const [reviewer, setReviewer] = useState(false);
   const [hover, setHover] = useState("");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
+    supabase.rpc("is_reviewer").then(({ data }) => setReviewer(data === true));
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setEmail(session?.user?.email ?? null);
     });
@@ -59,6 +61,7 @@ export default function AuthNav() {
         <>
           <Link href="/contribute" {...hoverProps("contribute", styles.chipPrimary)}>+ Contribute</Link>
           <Link href="/my-entries" {...hoverProps("myentries", styles.chip)}>My entries</Link>
+          {reviewer && <Link href="/review" {...hoverProps("review", styles.chip)}>Review</Link>}
           <span style={styles.email}>{email}</span>
           <button type="button" onClick={handleLogout} {...hoverProps("logout", styles.button)}>Log out</button>
         </>
