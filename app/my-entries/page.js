@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
+import EntryActions from "../../components/EntryActions.js";
 
 const STATUS_LABELS = {
-  pending: "Pending review / កំពុងរង់ចាំការពិនិត្យ",
-  published: "Published / បានផ្សព្វផ្សាយ",
+  pending: "Pending review / កំពុងរង់ចាំការពិនិត្យ", published: "Published / បានផ្សព្វផ្សាយ",
   returned: "Returned for revision / បានប្រគល់ជូនវិញ",
 };
 
@@ -16,7 +16,9 @@ const styles = {
   back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none", marginBottom: 16 },
   title: { color: "#E8ECE9", fontSize: 24, margin: "0 0 4px" },
   subtitle: { color: "#86B29B", fontSize: 14, margin: "0 0 24px" },
-  row: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "14px 0", borderBottom: "1px solid #2D4A3E", flexWrap: "wrap" },
+  row: { display: "flex", flexDirection: "column", gap: 10, padding: "14px 0", borderBottom: "1px solid #2D4A3E" },
+  rowTop: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" },
+  rowActions: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" },
   name: { color: "#DBE5DE", fontSize: 15, fontWeight: 600, margin: 0 }, sci: { color: "#86B29B", fontSize: 12, fontStyle: "italic", margin: "2px 0 0" },
   badge: { fontSize: 12, padding: "4px 10px", borderRadius: 4, border: "1px solid #2D4A3E", color: "#DBE5DE", backgroundColor: "#07100C", whiteSpace: "nowrap" },
   reviewerNote: { width: "100%", backgroundColor: "rgba(255, 180, 171, 0.08)", border: "1px solid rgba(255, 180, 171, 0.3)", color: "#FFB4AB", fontSize: 12, padding: "8px 10px", borderRadius: 4, margin: "6px 0 0", lineHeight: 1.6 },
@@ -28,6 +30,7 @@ export default function MyEntriesPage() {
   const [entries, setEntries] = useState(null); // null = loading
   const [signedOut, setSignedOut] = useState(false);
   const [error, setError] = useState(false);
+  const removeEntry = (id) => setEntries((prev) => prev.filter((e) => e.id !== id));
 
   useEffect(() => {
     const supabase = createClient();
@@ -36,8 +39,7 @@ export default function MyEntriesPage() {
       if (!u) return setSignedOut(true);
       supabase.from("entries")
         .select("id, title, scientific_name, status, review_note")
-        .eq("owner", u.id)
-        .order("created_at", { ascending: false })
+        .eq("owner", u.id).order("created_at", { ascending: false })
         .then(({ data: rows, error: fetchError }) => {
           // A silent failure here would falsely show "no entries".
           if (fetchError) { console.error(fetchError); setError(true); } else { setEntries(rows ?? []); }
@@ -68,11 +70,16 @@ export default function MyEntriesPage() {
         ) : (
           entries.map((entry) => (
             <div key={entry.id} style={styles.row}>
-              <div>
-                <p style={styles.name}>{entry.title}</p>
-                <p style={styles.sci}>{entry.scientific_name}</p>
+              <div style={styles.rowTop}>
+                <div>
+                  <p style={styles.name}>{entry.title}</p>
+                  <p style={styles.sci}>{entry.scientific_name}</p>
+                </div>
+                <div style={styles.rowActions}>
+                  <span style={styles.badge}>{STATUS_LABELS[entry.status] ?? entry.status}</span>
+                  <EntryActions entry={entry} onDelete={removeEntry} />
+                </div>
               </div>
-              <span style={styles.badge}>{STATUS_LABELS[entry.status] ?? entry.status}</span>
               {entry.status === "returned" && entry.review_note && (
                 <p style={styles.reviewerNote}>Reviewer note / ចំណាំពីអ្នកពិនិត្យ: {entry.review_note}</p>
               )}

@@ -367,11 +367,12 @@ function ContributeForm() {
       if (isEdit) {
         const { data: reviewerFlag, error: rpcErr } = await supabase.rpc("is_reviewer");
         const isReviewer = !rpcErr && reviewerFlag === true;
-        const updatePayload = isReviewer ? payload : { ...payload, status: "pending" };
+        const updatePayload = isReviewer ? payload : { ...payload, status: "pending", review_note: null };
         const { data, error: updateErr } = await supabase.from("entries")
           .update(updatePayload).eq("id", editId).select();
         if (!updateErr && data && data.length > 0) {
-          router.push("/");
+          // Reviewers return to the archive; contributors see the pending entry on their dashboard.
+          router.push(isReviewer ? "/" : "/my-entries");
           router.refresh();
           return;
         }
