@@ -17,9 +17,9 @@ const styles = {
   title: { color: "#E8ECE9", fontSize: 24, margin: "0 0 4px" },
   subtitle: { color: "#86B29B", fontSize: 14, margin: "0 0 24px" },
   row: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "14px 0", borderBottom: "1px solid #2D4A3E", flexWrap: "wrap" },
-  name: { color: "#DBE5DE", fontSize: 15, fontWeight: 600, margin: 0 },
-  sci: { color: "#86B29B", fontSize: 12, fontStyle: "italic", margin: "2px 0 0" },
+  name: { color: "#DBE5DE", fontSize: 15, fontWeight: 600, margin: 0 }, sci: { color: "#86B29B", fontSize: 12, fontStyle: "italic", margin: "2px 0 0" },
   badge: { fontSize: 12, padding: "4px 10px", borderRadius: 4, border: "1px solid #2D4A3E", color: "#DBE5DE", backgroundColor: "#07100C", whiteSpace: "nowrap" },
+  reviewerNote: { width: "100%", backgroundColor: "rgba(255, 180, 171, 0.08)", border: "1px solid rgba(255, 180, 171, 0.3)", color: "#FFB4AB", fontSize: 12, padding: "8px 10px", borderRadius: 4, margin: "6px 0 0", lineHeight: 1.6 },
   note: { color: "#86B29B", margin: 0, lineHeight: 1.8 },
   link: { color: "#B2D095", textDecoration: "none", fontSize: 13 },
 };
@@ -35,7 +35,7 @@ export default function MyEntriesPage() {
       const u = data.user;
       if (!u) return setSignedOut(true);
       supabase.from("entries")
-        .select("id, title, scientific_name, status")
+        .select("id, title, scientific_name, status, review_note")
         .eq("owner", u.id)
         .order("created_at", { ascending: false })
         .then(({ data: rows, error: fetchError }) => {
@@ -73,6 +73,9 @@ export default function MyEntriesPage() {
                 <p style={styles.sci}>{entry.scientific_name}</p>
               </div>
               <span style={styles.badge}>{STATUS_LABELS[entry.status] ?? entry.status}</span>
+              {entry.status === "returned" && entry.review_note && (
+                <p style={styles.reviewerNote}>Reviewer note / ចំណាំពីអ្នកពិនិត្យ: {entry.review_note}</p>
+              )}
             </div>
           ))
         )}

@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { createClient } from "../utils/supabase/client";
-
-const supabase = createClient();
+import ReviewActions from "./ReviewActions.js";
 
 const S = {
   card: { backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: 18, display: "flex", flexDirection: "column", gap: 12 },
@@ -18,29 +15,13 @@ const S = {
   tags: { display: "flex", flexWrap: "wrap", gap: 5 },
   tag: { backgroundColor: "rgba(200, 230, 169, 0.08)", border: "1px solid rgba(200, 230, 169, 0.25)", color: "#C8E6A9", fontSize: 12, padding: "2px 8px", borderRadius: 3 },
   caution: { backgroundColor: "rgba(255, 180, 171, 0.08)", border: "1px solid rgba(255, 180, 171, 0.3)", color: "#FFB4AB", padding: "8px 12px", borderRadius: 4, fontSize: 12.5 },
-  actions: { display: "flex", gap: 10, flexWrap: "wrap" },
-  publish: { fontSize: 12, fontWeight: 600, color: "#0C1511", backgroundColor: "#B2D095", border: "none", borderRadius: 4, padding: "6px 14px", cursor: "pointer", fontFamily: "inherit" },
-  ret: { fontSize: 12, color: "#FFB4AB", backgroundColor: "transparent", border: "1px solid #2D4A3E", borderRadius: 4, padding: "6px 14px", cursor: "pointer", fontFamily: "inherit" },
-  err: { color: "#FFB4AB", fontSize: 12, margin: 0 },
 };
 
 const Field = ({ label, value }) => (<div><p style={S.label}>{label}</p><p style={S.text}>{value}</p></div>);
 
 export default function ReviewCard({ entry, onDecided }) {
-  const [busy, setBusy] = useState(null);
-  const [failed, setFailed] = useState(false);
   const uses = (entry.medicinal_uses || "").split("\n").filter(Boolean);
   const compounds = (entry.chemical_compounds || "").split(/[;\n]/).map((t) => t.trim()).filter(Boolean);
-
-  async function decide(decision) {
-    setBusy(decision); setFailed(false);
-    // The review_entry RPC is the only door — never update the table directly.
-    const { data, error } = await supabase.rpc("review_entry", { entry_id: entry.id, decision });
-    setBusy(null);
-    if (!error && data === true) return onDecided(entry.id);
-    console.error("Review action failed:", error, "returned:", data);
-    setFailed(true);
-  }
 
   return (
     <article style={S.card}>
@@ -69,11 +50,7 @@ export default function ReviewCard({ entry, onDecided }) {
           {entry.caution && <div style={S.caution}><strong>Caution:</strong> {entry.caution}</div>}
         </div>
       </div>
-      {failed && <p style={S.err}>That decision was not saved. Please try again. / សម្រេចចិត្តមិនបានរក្សាទុកទេ។ សូមព្យាយាមម្តងទៀត។</p>}
-      <div style={S.actions}>
-        <button type="button" disabled={busy !== null} onClick={() => decide("published")} style={{ ...S.publish, opacity: busy ? 0.6 : 1 }}>Publish / ផ្សាយ</button>
-        <button type="button" disabled={busy !== null} onClick={() => decide("returned")} style={S.ret}>Return / ប្រគល់ជូនវិញ</button>
-      </div>
+      <ReviewActions entry={entry} onDecided={onDecided} />
     </article>
   );
 }
