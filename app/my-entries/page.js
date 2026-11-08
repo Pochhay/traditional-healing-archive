@@ -13,6 +13,7 @@ const STATUS_LABELS = {
 const styles = {
   page: { minHeight: "100vh", backgroundColor: "#0C1511", padding: "40px 16px", fontFamily: "'Kantumruy Pro', sans-serif" },
   card: { maxWidth: 720, margin: "0 auto", backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
+  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none", marginBottom: 16 },
   title: { color: "#E8ECE9", fontSize: 24, margin: "0 0 4px" },
   subtitle: { color: "#86B29B", fontSize: 14, margin: "0 0 24px" },
   row: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "14px 0", borderBottom: "1px solid #2D4A3E", flexWrap: "wrap" },
@@ -47,6 +48,7 @@ export default function MyEntriesPage() {
   return (
     <main style={styles.page}>
       <div style={styles.card}>
+        <Link href="/" style={styles.back}>← Back to Archive / ត្រឡប់ទៅទំព័រដើម</Link>
         <h1 style={styles.title}>My entries</h1>
         <p style={styles.subtitle}>រុក្ខជាតិរបស់ខ្ញុំ</p>
         {signedOut ? (

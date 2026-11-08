@@ -10,6 +10,7 @@ const supabase = createClient();
 const styles = {
   page: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 },
   card: { width: "100%", maxWidth: 400, backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
+  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none", marginBottom: 16 },
   title: { fontFamily: "'EB Garamond', Georgia, serif", fontSize: 28, margin: "0 0 4px" },
   subtitle: { fontSize: 14, color: "#86B29B", margin: "0 0 24px" },
   label: { display: "block", fontSize: 12, color: "#86B29B", letterSpacing: 0.5, marginBottom: 6 },
@@ -56,6 +57,7 @@ export default function SignupPage() {
   return (
     <div style={styles.page}>
       <form style={styles.card} onSubmit={handleSubmit}>
+        <Link href="/" style={styles.back}>← Back to Archive / ត្រឡប់ទៅទំព័រដើម</Link>
         <h1 style={styles.title}>Create account</h1>
         <p style={styles.subtitle}>បង្កើតគណនីថ្មី</p>
         {error && <p style={styles.error}>{error}</p>}
@@ -67,7 +69,7 @@ export default function SignupPage() {
         <input id="password" type="password" style={styles.input} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" minLength={8} required />
         <button type="submit" style={styles.button} disabled={loading}>{loading ? "Creating account…" : "Sign up"}</button>
         <p style={styles.links}>
-          Already have an account? <Link href="/login" style={styles.link}>Log in</Link> · <Link href="/" style={styles.link}>← Back to Archive</Link>
+          Already have an account? <Link href="/login" style={styles.link}>Log in</Link>
         </p>
       </form>
     </div>

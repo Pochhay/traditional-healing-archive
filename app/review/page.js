@@ -10,6 +10,7 @@ const supabase = createClient();
 const styles = {
   page: { minHeight: "100vh", backgroundColor: "#0C1511", padding: "40px 16px", fontFamily: "'Kantumruy Pro', sans-serif" },
   wrap: { maxWidth: 860, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 },
+  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none" },
   title: { color: "#E8ECE9", fontSize: 24, margin: "0 0 4px" },
   subtitle: { color: "#86B29B", fontSize: 14, margin: "0 0 24px" },
   note: { color: "#86B29B", margin: 0, lineHeight: 1.8 },
@@ -42,6 +43,7 @@ export default function ReviewPage() {
   return (
     <main style={styles.page}>
       <div style={styles.wrap}>
+        <Link href="/" style={styles.back}>← Back to Archive / ត្រឡប់ទៅទំព័រដើម</Link>
         <h1 style={styles.title}>Review queue</h1>
         <p style={styles.subtitle}>កន្លែងពិនិត្យរុក្ខជាតិរង់ចាំ</p>
         {state === "loading" && <p style={styles.note}>Loading queue… / កំពុងផ្ទុក…</p>}

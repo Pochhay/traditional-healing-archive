@@ -208,6 +208,7 @@ const styles = {
   page: { minHeight: "100vh", maxWidth: 720, margin: "0 auto", padding: "40px 20px 80px" },
   gateCard: { backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px", textAlign: "center" },
   card: { backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
+  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none", marginBottom: 16 },
   title: { fontFamily: "'EB Garamond', Georgia, serif", fontSize: 28, color: "#DBE5DE", margin: "0 0 4px" },
   subtitle: { fontSize: 14, color: "#86B29B", margin: "0 0 24px" },
   label: { display: "block", fontSize: 12, color: "#86B29B", letterSpacing: 0.5, margin: "16px 0 6px" },
@@ -443,10 +444,10 @@ function ContributeForm() {
       {err && <p style={styles.error}>{err}</p>}
     </>
   );
-
   return (
     <main style={styles.page}>
       <div style={styles.card}>
+        <Link href="/" style={styles.back}>← Back to Archive / ត្រឡប់ទៅទំព័រដើម</Link>
         <h1 style={styles.title}>{isEdit ? "Edit Plant Entry" : "Contribute a Plant"}</h1>
         <p style={styles.subtitle}>{isEdit ? "កែប្រែព័ត៌មានរុក្ខជាតិ" : "បញ្ចូលរុក្ខជាតិឱសថថ្មី"}</p>
         {banner && <p style={styles.banner}>{banner}</p>}
