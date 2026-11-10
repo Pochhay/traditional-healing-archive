@@ -74,16 +74,18 @@ AI assistance was utilized through Cline and Antigravity as an interactive pair-
 
 | Model | Task | AI Output | Human Review & Overruled Verdict |
 | :--- | :--- | :--- | :--- |
-| **Claude 3.7 Sonnet** (via Cline) | Review queue implementation (`app/review/page.js`) | Wrote queue interface with action buttons attempting direct table mutations: `supabase.from('entries').update({ status: 'published' })`. | **Overruled & Rewritten**: Rejected direct table update as insecure. Replaced with atomic call to `review_entry` RPC verifying `data === true`. |
-| **Claude 3.7 Sonnet** (via Cline) | ReviewCard line count refactor | Put review dialogs, state, and card rendering into a monolithic 100+ line component, violating Rule 5. | **Decomposed**: Split component into pure display `ReviewCard.js` (56 lines) and interactive `ReviewActions.js` (59 lines). |
-| **Gemini 2.5 Pro** (via Antigravity) | Botanical input validation | Suggested strict Latin binomial regex requiring two lowercase words and only `-aceae` plant families. | **Loosened**: Overruled to allow subfamilies (`-oideae`, e.g., `Mimosoideae`), abbreviations (`sp.`, `spp.`), single-genus records (`Leea`), and 'Unknown' fallbacks to respect real Cambodian flora. |
-| **Claude 3.7 Sonnet** (via Cline) | Contributor edit/delete on `/my-entries` | Added `EntryActions` integration and resubmission routing. | **Accepted with modifications**: Ensured `review_note` is explicitly nulled out on resubmit and non-reviewers are redirected to `/my-entries`. |
+| **GLM 5.3** (via Cline) | Review queue implementation (`app/review/page.js`) | Wrote queue interface with action buttons attempting direct table mutations: `supabase.from('entries').update({ status: 'published' })`. | **Overruled & Rewritten**: Rejected direct table update as insecure. Replaced with atomic call to `review_entry` RPC verifying `data === true`. |
+| **DeepSeek V4 Flash** (via Cline) | Component decomposition & line count compliance | Put review dialogs, state, and card rendering into a monolithic component, violating Rule 5. | **Decomposed**: Split component into pure display `ReviewCard.js` (56 lines) and interactive `ReviewActions.js` (59 lines). |
+| **Gemini 3.8 Flash** (via Cline) | Search highlighting, contributor actions, and pagination | Generated search text splitting logic, owner edit/delete flow, and progressive pagination controls. | **Polished**: Verified captured group split for Khmer character cluster safety and ensured instant filter resets on typing. |
+| **Gemini 2.5 Pro** (via Antigravity) | Botanical input validation & architectural auditing | Suggested strict Latin binomial regex requiring two lowercase words and only `-aceae` plant families. | **Loosened**: Overruled to allow subfamilies (`-oideae`, e.g., `Mimosoideae`), abbreviations (`sp.`, `spp.`), single-genus records (`Leea`), and 'Unknown' fallbacks to respect real Cambodian flora. |
 
 **Verification Method**: Every AI diff was inspected prior to staging. The system was verified via clean builds (`npm run build`), console penetration attacks from a secondary stranger account (`po@gmail.com`), and cross-checking PostgreSQL constraint violations.
 
 ---
 
 ## 6. Sources and credits
+
+> ⚠️ **Author Note — Fact-Check Prior to Capstone Evaluation**: The following ethnobotanical sources, healers, and market informants represent the preliminary documentation baseline and must be cross-verified against personal field logs and provincial notes.
 
 Every specimen in this archive represents authentic Cambodian botanical knowledge, cross-referenced between classical ethnobotanical literature and field observation:
 
