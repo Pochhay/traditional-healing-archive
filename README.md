@@ -84,20 +84,25 @@ AI assistance was utilized through Cline and Antigravity as an interactive pair-
 
 ## 6. Sources and credits
 
-> ⚠️ **Author Note — Fact-Check Prior to Capstone Evaluation**: The following ethnobotanical sources, healers, and market informants represent the preliminary documentation baseline and must be cross-verified against personal field logs and provincial notes.
+Every specimen in this archive represents authentic Cambodian botanical knowledge, compiled directly from published national pharmacognosy literature, university research papers, verified digital medical applications, and peer contributions:
 
-Every specimen in this archive represents authentic Cambodian botanical knowledge, cross-referenced between classical ethnobotanical literature and field observation:
-
-* **Published Reference Literature**:
-  * Dy Phon, Pauline. *Dictionnaire des Plantes Utilisées au Cambodge* (Dictionary of Plants Used in Cambodia), Phnom Penh, 2000.
-  * Ministry of Health, National Center of Traditional Medicine. *Medicinal Plants in Cambodia*, Phnom Penh.
-  * Lecompte, H., et al. *Flore Générale de l'Indo-Chine*, Muséum National d'Histoire Naturelle, Paris.
-* **Field Informants & Cultural Contributors**:
-  * Traditional medicine market stallholders at Phsar Orussey (Phnom Penh) and Phsar Leu Thom Thmey (Siem Reap) who verified local vernacular names and preparation forms.
-  * *Kru Khmer* practitioner in Kandal Province who provided traditional dosage guidelines for *Barleria lupulina* (Mjul Meas) and *Polygonum tomentosum* (Kanthang Hae).
-  * Community contributors: Raksmey, pochhay123, and peer student testers.
-* **Photography**:
-  * In situ field photographs taken in Kandal, Siem Reap, and Phnom Penh home gardens, supplemented with documented botanical herbarium records cited per accession card.
+* **Official Ministry of Health Publications (National Center of Traditional Medicine)**:
+  * គី ប៊ូហាំង, ថៃ សាវី, ទីវ ឆេងយៀន, ប៊ូ កែវចិន្តា, ពៅ ដា, ម៉េង អុង, ម៉ៅ សុខលីម, លី ហួរ, លីម ធេន, សួន សំអឿន, ហង្ស សុខម, ហ៊ាន ពន្លឺ, ហួន ភុំ, ឡាំ យឹម, អ៊ិន សាម៉ន, *រុក្ខជាតិឱសថកម្ពុជា*, ក្រសួងសុខាភិបាល មជ្ឈមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របុរាណ, បោះពុម្ពដោយថវិកាជាតិ, 2013.
+  * ចេង ស៊ិនកាំង, ចេងលី បូកា, ប្រាក់ ស៊ីសុផុន, ហួន ភុំ, អ៊ិន សាម៉ន, *រុក្ខជាតិឱសថកម្ពុជា (ភាគ១ & ភាគ២)*, ក្រសួងសុខាភិបាល មជ្ឈមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របុរាណ, បោះពុម្ពដោយថវិកាជាតិ, 1997.
+  * ម៉ី សាម៉ឺឌី, ហ៊ាង ពន្លឺ, *រុក្ខជាតិឱសថកម្ពុជា*, ក្រសួងសុខាភិបាល មជ្ឈមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របុរាណ, បោះពុម្ពដោយថវិកាជាតិ, 2006.
+* **Academic Research & Phytochemical Literature**:
+  * University of Puthisastra & ASEAN PharmNET: *Organoleptic and phytochemical evaluation of different extracts of Vernonia cinerea (L.) Less. whole plant of Cambodia*.
+  * PubMed: [Biological and pharmacological activity of Barleria lupulina extracts](https://pubmed.ncbi.nlm.nih.gov/15656660/).
+  * ScienceDirect / Fitoterapia: [Ethnobotanical and chemical evaluations of medicinal flora](https://www.sciencedirect.com/science/article/pii/S0367326X04000413).
+  * Pakistan Journal of Nutrition: [Nutritional and biochemical analysis of Leucaena](https://scialert.net/fulltext/?doi=pjn.2009.548.550).
+  * Journal of Herbs, Spices & Medicinal Plants: [Pharmacognostic characterization of Southeast Asian traditional plants](https://www.tandfonline.com/doi/abs/10.1080/10496475.2011.653711).
+  * ResearchGate: [Chemical constituents of medicinal plant leaves](https://www.researchgate.net/publication/264707868_Chemical_constituents_of_Vitex_negundo_leaves).
+* **Digital Reference Systems & Community Informants**:
+  * *ANT Khmer Medical App* for vernacular nomenclature verification and traditional symptom classification.
+  * Community contributors: `Raksmey` and `pochhay123` for new specimen submissions and community peer review.
+* **Photography & Visual Documentation**:
+  * Specimen photographs for the initial catalog entries were compiled from open educational reference sources and botanical visual databases (via Google and Pinterest research) strictly for non-commercial academic study and digital preservation.
+  * Community-contributed specimen images (such as *Sphaerocoryne lefevrei* / Romdul and *Bloom Boy*) were captured and contributed directly by registered users via Supabase Storage.
 
 ---
 
