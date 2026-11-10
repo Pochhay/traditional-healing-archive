@@ -13,10 +13,6 @@ const styles = {
     justifyContent: "space-between", gap: 8, paddingBottom: 10,
     borderBottom: "1px solid #232C27",
   },
-  accession: {
-    fontFamily: "'EB Garamond', Georgia, serif", fontSize: 11,
-    letterSpacing: 1.5, color: "#A3D1B8", textTransform: "uppercase", fontWeight: 600,
-  },
   familyBadge: {
     fontSize: 11, color: "#B2D095", backgroundColor: "#232C27",
     border: "1px solid #2D4A3E", padding: "2px 8px", borderRadius: 3,
@@ -39,17 +35,12 @@ const styles = {
 };
 
 export default function EntryCard({ entry, user, onDelete }) {
-  const { id, family, image, nameEnglish, nameKhmer, location, owner, contributor = collection.curator } = entry;
+  const { family, image, nameEnglish, nameKhmer, location, owner, contributor = collection.curator } = entry;
   const isOwner = user && user.id === owner;
   return (
     <article style={styles.card}>
       <div style={styles.ribbon}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
-          <span style={styles.accession}>Accession: KH-MED-{id.toUpperCase()}</span>
-          <span style={{ fontSize: 11, color: "#86B29B", letterSpacing: 0.5 }}>
-            By: {contributor}
-          </span>
-        </div>
+        <span style={{ fontSize: 11, color: "#86B29B", letterSpacing: 0.5 }}>By: {contributor}</span>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
           {isOwner && <EntryActions entry={entry} onDelete={onDelete} />}
           <span style={styles.familyBadge}>Family: {family}</span>
