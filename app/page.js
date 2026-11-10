@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import HerbariumHeader from "../components/HerbariumHeader.js";
 import SearchFilter from "../components/SearchFilter.js";
 import EntryCard from "../components/EntryCard.js";
+import PaginationControls from "../components/PaginationControls.js";
 import { createClient } from "../utils/supabase/client";
 
 const supabase = createClient();
+const PAGE_SIZE = 6;
 
 // Map a database row to the shape EntryCard / SpecimenDetails expect.
 function mapEntry(row) {
@@ -52,9 +54,13 @@ export default function Home() {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [activeField, setActiveField] = useState("all");
+  const [visible, setVisible] = useState(PAGE_SIZE);
   const [user, setUser] = useState(null);
 
   const removeEntry = (id) => setEntries((prev) => prev.filter((e) => e.id !== id));
+  // Any new query or filter change restarts the feed at page 1 (same tick, no flash).
+  const setQueryAndReset = (value) => { setQuery(value); setVisible(PAGE_SIZE); };
+  const setFieldAndReset = (value) => { setActiveField(value); setVisible(PAGE_SIZE); };
 
   useEffect(() => {
     supabase.from("entries").select("*").eq("status", "published").order("created_at", { ascending: false }).then(({ data, error: fetchError }) => {
@@ -76,15 +82,16 @@ export default function Home() {
     const fields = ["nameKhmer", "nameEnglish", "scientificName", "family", "description", "location", "dosage", "caution"];
     return fields.some((f) => match(entry[f])) || matchArr(entry.chemicalCompounds) || matchArr(entry.medicinalUses);
   });
+  const shown = filtered.slice(0, visible);
 
   return (
     <main style={styles.wrap}>
       <HerbariumHeader />
       <SearchFilter
         query={query}
-        setQuery={setQuery}
+        setQuery={setQueryAndReset}
         activeField={activeField}
-        setActiveField={setActiveField}
+        setActiveField={setFieldAndReset}
         resultCount={filtered.length}
         totalCount={(entries ?? []).length}
       />
@@ -100,7 +107,7 @@ export default function Home() {
             <span style={{ color: "#86B29B" }}>Loading specimen records from the archive…</span>
           </div>
         ) : filtered.length > 0 ? (
-          filtered.map((entry) => <EntryCard key={entry.id} entry={entry} user={user} onDelete={removeEntry} />)
+          shown.map((entry) => <EntryCard key={entry.id} entry={entry} user={user} onDelete={removeEntry} query={q} />)
         ) : (
           <div style={styles.empty}>
             <span style={{ fontSize: 18, color: "#B2D095" }}>រកមិនឃើញរុក្ខជាតិឱសថទេ</span>
@@ -108,6 +115,10 @@ export default function Home() {
           </div>
         )}
       </div>
+      {!error && filtered.length > 0 && (
+        <PaginationControls total={filtered.length} visible={shown.length}
+          onLoadMore={() => setVisible((v) => v + PAGE_SIZE)} />
+      )}
       <footer style={styles.footer}>
         Built in ICT 340 — Vibe Coding, American University of Phnom Penh, Fall 2026.
       </footer>

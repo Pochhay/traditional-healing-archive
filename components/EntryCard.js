@@ -1,6 +1,7 @@
 import React from "react";
 import SpecimenDetails from "./SpecimenDetails.js";
 import EntryActions from "./EntryActions.js";
+import HighlightText from "./HighlightText.js";
 import collection from "../collection.config.js";
 
 const styles = {
@@ -34,7 +35,7 @@ const styles = {
   },
 };
 
-export default function EntryCard({ entry, user, onDelete }) {
+export default function EntryCard({ entry, user, onDelete, query = "" }) {
   const { family, image, nameEnglish, nameKhmer, location, owner, contributor = collection.curator } = entry;
   const isOwner = user && user.id === owner;
   return (
@@ -43,7 +44,7 @@ export default function EntryCard({ entry, user, onDelete }) {
         <span style={{ fontSize: 11, color: "#86B29B", letterSpacing: 0.5 }}>By: {contributor}</span>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
           {isOwner && <EntryActions entry={entry} onDelete={onDelete} />}
-          <span style={styles.familyBadge}>Family: {family}</span>
+          <span style={styles.familyBadge}>Family: <HighlightText text={family} query={query} /></span>
         </div>
       </div>
       <div style={styles.body}>
@@ -54,11 +55,11 @@ export default function EntryCard({ entry, user, onDelete }) {
           {location && (
             <div style={styles.habitatBox}>
               <p style={styles.habitatLabel}>Habitat & Ecozone</p>
-              <span>{location}</span>
+              <span><HighlightText text={location} query={query} /></span>
             </div>
           )}
         </div>
-        <SpecimenDetails entry={entry} />
+        <SpecimenDetails entry={entry} query={query} />
       </div>
     </article>
   );

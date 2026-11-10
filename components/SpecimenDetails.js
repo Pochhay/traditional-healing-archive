@@ -1,3 +1,5 @@
+import HighlightText from "./HighlightText.js";
+
 const styles = {
   wrap: { display: "flex", flexDirection: "column", gap: 12, flex: "1 1 340px" },
   header: { borderBottom: "1px solid #2D4A3E", paddingBottom: 8 },
@@ -18,21 +20,21 @@ const styles = {
   },
 };
 
-export default function SpecimenDetails({ entry }) {
+export default function SpecimenDetails({ entry, query = "" }) {
   const { nameKhmer, nameEnglish, scientificName, description, chemicalCompounds, medicinalUses, dosage, caution } = entry;
   return (
     <div style={styles.wrap}>
       <div style={styles.header}>
-        <h2 style={styles.khmer}>{nameKhmer}</h2>
-        <p style={styles.english}>{nameEnglish}</p>
-        <p style={styles.scientific}>{scientificName}</p>
+        <h2 style={styles.khmer}><HighlightText text={nameKhmer} query={query} /></h2>
+        <p style={styles.english}><HighlightText text={nameEnglish} query={query} /></p>
+        <p style={styles.scientific}><HighlightText text={scientificName} query={query} /></p>
       </div>
-      <p style={styles.desc}>{description}</p>
+      <p style={styles.desc}><HighlightText text={description} query={query} /></p>
       {chemicalCompounds?.length > 0 && (
         <div>
           <p style={styles.label}>Active Compounds</p>
           <div style={styles.tagGroup}>
-            {chemicalCompounds.map((c, i) => <span key={`${c}-${i}`} style={styles.tag}>{c}</span>)}
+            {chemicalCompounds.map((c, i) => <span key={`${c}-${i}`} style={styles.tag}><HighlightText text={c} query={query} /></span>)}
           </div>
         </div>
       )}
@@ -40,16 +42,16 @@ export default function SpecimenDetails({ entry }) {
         <div>
           <p style={styles.label}>Medicinal Uses & Indications</p>
           <ul style={styles.useList}>
-            {medicinalUses.map((u, i) => <li key={i}>{u}</li>)}
+            {medicinalUses.map((u, i) => <li key={i}><HighlightText text={u} query={query} /></li>)}
           </ul>
         </div>
       )}
       {dosage && (
         <div style={{ fontSize: 12.5, color: "#9EB3A6", lineHeight: 1.5 }}>
-          <div><strong style={{ color: "#DBE5DE" }}>Dosage:</strong> {dosage}</div>
+          <div><strong style={{ color: "#DBE5DE" }}>Dosage:</strong> <HighlightText text={dosage} query={query} /></div>
         </div>
       )}
-      {caution && <div style={styles.caution}><strong>Caution:</strong> {caution}</div>}
+      {caution && <div style={styles.caution}><strong>Caution:</strong> <HighlightText text={caution} query={query} /></div>}
     </div>
   );
 }
