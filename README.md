@@ -70,14 +70,13 @@ A client-side UI gate (e.g., hiding a "Publish" button or conditionally renderin
 
 ## 5. AI use
 
-AI assistance was utilized through Cline and Antigravity as an interactive pair-programmer, test auditor, and junior developer under strict human review:
+AI assistance was utilized through Cline and Antigravity as an interactive pair-programmer, test auditor, and junior developer under strict human review. The primary model used via Cline was **GLM 5.3 Flash**, with **DeepSeek V4 Flash** used for specific component refactorings, and **Gemini 3.8 Flash** (via Antigravity) serving as the architectural auditor, prompt engineer, and reviewer:
 
 | Model | Task | AI Output | Human Review & Overruled Verdict |
 | :--- | :--- | :--- | :--- |
-| **GLM 5.3** (via Cline) | Review queue implementation (`app/review/page.js`) | Wrote queue interface with action buttons attempting direct table mutations: `supabase.from('entries').update({ status: 'published' })`. | **Overruled & Rewritten**: Rejected direct table update as insecure. Replaced with atomic call to `review_entry` RPC verifying `data === true`. |
-| **DeepSeek V4 Flash** (via Cline) | Component decomposition & line count compliance | Put review dialogs, state, and card rendering into a monolithic component, violating Rule 5. | **Decomposed**: Split component into pure display `ReviewCard.js` (56 lines) and interactive `ReviewActions.js` (59 lines). |
-| **Gemini 3.8 Flash** (via Cline) | Search highlighting, contributor actions, and pagination | Generated search text splitting logic, owner edit/delete flow, and progressive pagination controls. | **Polished**: Verified captured group split for Khmer character cluster safety and ensured instant filter resets on typing. |
-| **Gemini 2.5 Pro** (via Antigravity) | Botanical input validation & architectural auditing | Suggested strict Latin binomial regex requiring two lowercase words and only `-aceae` plant families. | **Loosened**: Overruled to allow subfamilies (`-oideae`, e.g., `Mimosoideae`), abbreviations (`sp.`, `spp.`), single-genus records (`Leea`), and 'Unknown' fallbacks to respect real Cambodian flora. |
+| **GLM 5.3 Flash** (via Cline — Primary) | Review queue implementation (`app/review/page.js`), contributor edit/delete flow, and infinite scroll | Wrote queue interface with action buttons attempting direct table mutations: `supabase.from('entries').update({ status: 'published' })`. | **Overruled & Rewritten**: Rejected direct table update as insecure. Replaced with atomic call to `review_entry` RPC verifying `data === true`. Polished resubmission to clear `review_note`. |
+| **DeepSeek V4 Flash** (via Cline) | Component decomposition & line count compliance | Put review dialogs, state, and card rendering into a single monolithic component, violating Rule 5. | **Decomposed**: Split component into pure display `ReviewCard.js` (56 lines) and interactive `ReviewActions.js` (59 lines) to honor AGENTS.md line limits. |
+| **Gemini 3.8 Flash** (via Antigravity) | Architectural auditing, prompt generation, code review & botanical validation | Formulated structured prompts for Cline, reviewed diffs against AGENTS.md, audited security attacks, and caught overly rigid botanical validation patterns. | **Enforced Standards**: Loosened botanical validators to support open nomenclature (`-oideae`, `sp.`, single genus `Leea`), designed regex-free Khmer split highlighting, and enforced Rule 5 boundaries. |
 
 **Verification Method**: Every AI diff was inspected prior to staging. The system was verified via clean builds (`npm run build`), console penetration attacks from a secondary stranger account (`po@gmail.com`), and cross-checking PostgreSQL constraint violations.
 
