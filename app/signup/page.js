@@ -4,14 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
+import LanguageToggle from "../../components/LanguageToggle.js";
+import { useLanguage } from "../../components/LanguageProvider.js";
+import { UI_TRANSLATIONS } from "../../utils/translations.js";
 
 const supabase = createClient();
 
 const styles = {
   page: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 },
   card: { width: "100%", maxWidth: 400, backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
-  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none", marginBottom: 16 },
-  title: { fontFamily: "'EB Garamond', Georgia, serif", fontSize: 28, margin: "0 0 4px" },
+  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none" },
+  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 },
+  title: { fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 28, margin: "0 0 4px" },
   subtitle: { fontSize: 14, color: "#86B29B", margin: "0 0 24px" },
   label: { display: "block", fontSize: 12, color: "#86B29B", letterSpacing: 0.5, marginBottom: 6 },
   input: {
@@ -32,6 +36,8 @@ const styles = {
 
 export default function SignupPage() {
   const router = useRouter();
+  const { lang } = useLanguage();
+  const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,7 +55,7 @@ export default function SignupPage() {
     });
     setLoading(false);
     // Generic message only — no enumeration, no Supabase error details surfaced.
-    if (signUpError) return setError("Could not complete sign up. Please check your details and try again.");
+    if (signUpError) return setError(t.genericError);
     router.push("/");
     router.refresh();
   }
@@ -57,19 +63,22 @@ export default function SignupPage() {
   return (
     <div style={styles.page}>
       <form style={styles.card} onSubmit={handleSubmit}>
-        <Link href="/" style={styles.back}>← Back to Archive / ត្រឡប់ទៅទំព័រដើម</Link>
-        <h1 style={styles.title}>Create account</h1>
-        <p style={styles.subtitle}>បង្កើតគណនីថ្មី</p>
+        <div style={styles.topBar}>
+          <Link href="/" style={styles.back}>{t.backToArchive}</Link>
+          <LanguageToggle />
+        </div>
+        <h1 style={styles.title}>{t.signupTitle}</h1>
+        <p style={styles.subtitle}>{t.signupSubtitle}</p>
         {error && <p style={styles.error}>{error}</p>}
-        <label style={styles.label} htmlFor="username">Username</label>
+        <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }} htmlFor="username">{t.usernameLabel}</label>
         <input id="username" type="text" style={styles.input} value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" minLength={2} maxLength={30} required />
-        <label style={styles.label} htmlFor="email">Email</label>
+        <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }} htmlFor="email">{t.emailLabel}</label>
         <input id="email" type="email" style={styles.input} value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
-        <label style={styles.label} htmlFor="password">Password</label>
+        <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }} htmlFor="password">{t.passwordLabel}</label>
         <input id="password" type="password" style={styles.input} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" minLength={8} required />
-        <button type="submit" style={styles.button} disabled={loading}>{loading ? "Creating account…" : "Sign up"}</button>
+        <button type="submit" style={styles.button} disabled={loading}>{loading ? t.creatingAccount : t.signupTitle}</button>
         <p style={styles.links}>
-          Already have an account? <Link href="/login" style={styles.link}>Log in</Link>
+          {t.haveAccount} <Link href="/login" style={styles.link}>{t.navSignIn}</Link>
         </p>
       </form>
     </div>

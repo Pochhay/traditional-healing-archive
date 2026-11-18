@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "./LanguageProvider.js";
+import { UI_TRANSLATIONS } from "../utils/translations.js";
 
 const styles = {
   wrap: {
@@ -23,7 +25,9 @@ const styles = {
   limit: { width: "100%", margin: "4px 0 0", fontSize: 12, color: "#FFB4AB" },
 };
 
-export default function TagInput({ value = [], onChange, placeholder = "Add compound, press Enter", disabled = false, maxTags = 100 }) {
+export default function TagInput({ value = [], onChange, placeholder, disabled = false, maxTags = 100 }) {
+  const { lang } = useLanguage();
+  const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   const [draft, setDraft] = useState("");
 
   function addTag(raw) {
@@ -61,14 +65,14 @@ export default function TagInput({ value = [], onChange, placeholder = "Add comp
         <input
           style={styles.input}
           value={draft}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t.tagPlaceholder}
           disabled={disabled}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={onKeyDown}
           onBlur={() => addTag(draft)}
         />
       </div>
-      {value.length >= maxTags && <p style={styles.limit}>Maximum of {maxTags} compounds reached.</p>}
+      {value.length >= maxTags && <p style={styles.limit}>{t.tagMaxLimit(maxTags)}</p>}
     </div>
   );
 }

@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { UI_TRANSLATIONS } from "../utils/translations.js";
+import { useLanguage } from "./LanguageProvider.js";
 
 const styles = {
   wrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 4 },
   progress: {
     display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: 10,
-    fontFamily: "'EB Garamond', Georgia, serif", fontSize: 13, color: "#9EB3A6", letterSpacing: 0.4, textAlign: "center",
+    fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 13, color: "#9EB3A6", letterSpacing: 0.4, textAlign: "center",
   },
   track: { width: 110, height: 4, borderRadius: 2, backgroundColor: "#232C27", overflow: "hidden" },
   fill: (ratio) => ({
@@ -15,12 +17,15 @@ const styles = {
   }),
   sentinel: {
     width: "100%", padding: "12px 0 4px", textAlign: "center", fontSize: 12.5,
-    fontStyle: "italic", color: "#6E8A7C", fontFamily: "'EB Garamond', Georgia, serif", letterSpacing: 0.5,
+    fontStyle: "italic", color: "#6E8A7C", fontFamily: "'Kantumruy Pro', sans-serif", letterSpacing: 0.5,
   },
-  done: { fontSize: 12, color: "#6E8A7C", fontFamily: "'EB Garamond', Georgia, serif", letterSpacing: 0.6, textAlign: "center" },
+  done: { fontSize: 12, color: "#6E8A7C", fontFamily: "'Kantumruy Pro', sans-serif", letterSpacing: 0.6, textAlign: "center" },
 };
 
-export default function PaginationControls({ visible, total, onLoadMore }) {
+export default function PaginationControls({ visible, total, onLoadMore, lang: langProp }) {
+  const { lang: ctxLang } = useLanguage();
+  const lang = langProp ?? ctxLang;
+  const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   const sentinelRef = useRef(null);
   const loadMoreRef = useRef(onLoadMore);
   const hasMore = visible < total;
@@ -45,16 +50,16 @@ export default function PaginationControls({ visible, total, onLoadMore }) {
 
   return (
     <div style={styles.wrap}>
-      <div style={styles.progress}>
-        <span>Showing {visible} of {total} specimens / កំពុងបង្ហាញ {visible} នៃ {total} គំរូ</span>
+      <div style={{ ...styles.progress, letterSpacing: lang === "km" ? 0 : 0.4 }}>
+        <span>{t.showingProgress(visible, total)}</span>
         <div style={styles.track}><div style={styles.fill(ratio)} /></div>
       </div>
       {hasMore ? (
         <div ref={sentinelRef} role="status" style={styles.sentinel}>
-          កំពុងទាញយកគំរូបន្ថែម… / Loading more specimens…
+          {t.loadingMore}
         </div>
       ) : (
-        <span style={styles.done}>All specimens shown / បានបង្ហាញរុក្ខជាតិទាំងអស់</span>
+        <span style={{ ...styles.done, letterSpacing: lang === "km" ? 0 : 0.6 }}>{t.allShown}</span>
       )}
     </div>
   );

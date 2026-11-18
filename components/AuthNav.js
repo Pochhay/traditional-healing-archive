@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "../utils/supabase/client";
+import { useLanguage } from "./LanguageProvider.js";
+import { UI_TRANSLATIONS } from "../utils/translations.js";
 
 const supabase = createClient();
 
@@ -28,8 +30,9 @@ const styles = {
 
 export default function AuthNav() {
   const router = useRouter();
-  // undefined = still checking, null = logged out, string = logged in.
-  const [email, setEmail] = useState(undefined);
+  const { lang } = useLanguage();
+  const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
+  const [email, setEmail] = useState(undefined); // undefined = checking, null = logged out
   const [reviewer, setReviewer] = useState(false);
   const [hover, setHover] = useState("");
 
@@ -59,16 +62,16 @@ export default function AuthNav() {
     <nav style={styles.nav}>
       {email ? (
         <>
-          <Link href="/contribute" {...hoverProps("contribute", styles.chipPrimary)}>+ Contribute</Link>
-          <Link href="/my-entries" {...hoverProps("myentries", styles.chip)}>My entries</Link>
-          {reviewer && <Link href="/review" {...hoverProps("review", styles.chip)}>Review</Link>}
+          <Link href="/contribute" {...hoverProps("contribute", styles.chipPrimary)}>{t.navContribute}</Link>
+          <Link href="/my-entries" {...hoverProps("myentries", styles.chip)}>{t.navMyEntries}</Link>
+          {reviewer && <Link href="/review" {...hoverProps("review", styles.chip)}>{t.navReview}</Link>}
           <span style={styles.email}>{email}</span>
-          <button type="button" onClick={handleLogout} {...hoverProps("logout", styles.button)}>Log out</button>
+          <button type="button" onClick={handleLogout} {...hoverProps("logout", styles.button)}>{t.navLogout}</button>
         </>
       ) : (
         <>
-          <Link href="/login" {...hoverProps("signin", styles.chip)}>Sign in</Link>
-          <Link href="/signup" {...hoverProps("signup", styles.chipPrimary)}>Sign up</Link>
+          <Link href="/login" {...hoverProps("signin", styles.chip)}>{t.navSignIn}</Link>
+          <Link href="/signup" {...hoverProps("signup", styles.chipPrimary)}>{t.navSignUp}</Link>
         </>
       )}
     </nav>

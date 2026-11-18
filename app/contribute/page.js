@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
 import TagInput from "../../components/TagInput.js";
+import LanguageToggle from "../../components/LanguageToggle.js";
+import { useLanguage } from "../../components/LanguageProvider.js";
+import { UI_TRANSLATIONS } from "../../utils/translations.js";
 
 const supabase = createClient();
 
@@ -216,8 +219,9 @@ const styles = {
   page: { minHeight: "100vh", maxWidth: 720, margin: "0 auto", padding: "40px 20px 80px" },
   gateCard: { backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px", textAlign: "center" },
   card: { backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
-  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none", marginBottom: 16 },
-  title: { fontFamily: "'EB Garamond', Georgia, serif", fontSize: 28, color: "#DBE5DE", margin: "0 0 4px" },
+  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none" },
+  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 },
+  title: { fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 28, color: "#DBE5DE", margin: "0 0 4px" },
   subtitle: { fontSize: 14, color: "#86B29B", margin: "0 0 24px" },
   label: { display: "block", fontSize: 12, color: "#86B29B", letterSpacing: 0.5, margin: "16px 0 6px" },
   input,
@@ -252,6 +256,8 @@ const VALIDATORS = {
 function ContributeForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { lang } = useLanguage();
+  const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   const editId = searchParams.get("id");
   const isEdit = Boolean(editId);
   // undefined = loading, null = signed out, object = signed in.
@@ -263,7 +269,7 @@ function ContributeForm() {
   });
   const [photo, setPhoto] = useState(null);
   const [errors, setErrors] = useState({});
-  const [banner, setBanner] = useState("");
+  const [banner, setBanner] = useState(""); // stores a translation key so it follows language switches
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(null); // null | "photo" | "save"
   const [loadingEntry, setLoadingEntry] = useState(isEdit);
@@ -278,7 +284,7 @@ function ContributeForm() {
     supabase.from("entries").select("*").eq("id", editId).single().then(({ data, error }) => {
       if (error || !data) {
         setLoadingEntry(false);
-        setBanner("Could not load this entry for editing.");
+        setBanner("loadEntryFailed");
         return;
       }
       setForm({
@@ -290,7 +296,7 @@ function ContributeForm() {
         habitat: data.habitat ?? "",
         medicinalUses: data.medicinal_uses ?? "",
         chemicalCompounds: data.chemical_compounds
-          ? data.chemical_compounds.split(/[;\n]/).map((t) => t.trim()).filter(Boolean)
+          ? data.chemical_compounds.split(/[;\n]/).map((c) => c.trim()).filter(Boolean)
           : [],
         dosage: data.dosage ?? "",
         caution: data.caution ?? "",
@@ -326,13 +332,13 @@ function ContributeForm() {
     const errs = validateAll();
     setErrors(errs);
     if (Object.keys(errs).length > 0) {
-      setBanner("Please fix the highlighted fields before submitting.");
+      setBanner("fixFieldsBanner");
       return;
     }
 
     const { data: { user: u } } = await supabase.auth.getUser();
     if (!u) {
-      setBanner("Your session has expired. Please sign in again.");
+      setBanner("sessionExpiredBanner");
       return;
     }
 
@@ -377,7 +383,7 @@ function ContributeForm() {
           return;
         }
         console.error("Update failed or refused by policy:", updateErr);
-        setBanner("That change wasn't saved");
+        setBanner("saveFailedAlert");
         setBusy(null);
         return;
       }
@@ -391,7 +397,7 @@ function ContributeForm() {
       setBusy(null);
     } catch (err) {
       console.error(err); // log real error, never surface it to the user
-      setBanner("Something went wrong. Please try again.");
+      setBanner("genericError");
       setBusy(null);
     }
   }
@@ -402,14 +408,17 @@ function ContributeForm() {
     return (
       <main style={styles.page}>
         <div style={styles.gateCard}>
-          <h1 style={styles.title}>Contribute to the Archive</h1>
+          <div style={{ ...styles.topBar, justifyContent: "flex-end" }}>
+            <LanguageToggle />
+          </div>
+          <h1 style={styles.title}>{t.contribGateTitle}</h1>
           <p style={{ color: "#86B29B", margin: "12px 0 24px" }}>
-            You must be signed in to contribute to the archive.
+            {t.contribGateDesc}
           </p>
           <p style={{ fontSize: 14 }}>
-            <Link href="/login" style={styles.link}>Sign in</Link>
+            <Link href="/login" style={styles.link}>{t.navSignIn}</Link>
             {" · "}
-            <Link href="/signup" style={styles.link}>Sign up</Link>
+            <Link href="/signup" style={styles.link}>{t.navSignUp}</Link>
           </p>
         </div>
       </main>
@@ -420,7 +429,7 @@ function ContributeForm() {
     return (
       <main style={styles.page}>
         <div style={styles.card}>
-          <p style={{ color: "#86B29B", margin: 0 }}>Loading entry…</p>
+          <p style={{ color: "#86B29B", margin: 0 }}>{t.loadingEntry}</p>
         </div>
       </main>
     );
@@ -430,16 +439,15 @@ function ContributeForm() {
     return (
       <main style={styles.page}>
         <div style={styles.card}>
-          <h1 style={styles.title}>Entry submitted</h1>
-          <p style={{ ...styles.subtitle, lineHeight: 1.8 }}>
-            Your entry has been submitted and is waiting for review before publication.
-            <br />
-            ការបញ្ចូលព័ត៌មានរបស់អ្នកត្រូវបានបញ្ជូនរួចរាល់ ហើយកំពុងរង់ចាំការពិនិត្យមុននឹងផ្សព្វផ្សាយ។
-          </p>
+          <div style={{ ...styles.topBar, justifyContent: "flex-end" }}>
+            <LanguageToggle />
+          </div>
+          <h1 style={styles.title}>{t.submittedTitle}</h1>
+          <p style={{ ...styles.subtitle, lineHeight: 1.8 }}>{t.submittedDesc}</p>
           <p style={{ margin: 0 }}>
-            <Link href="/" style={styles.link}>← Back to Archive</Link>
+            <Link href="/" style={styles.link}>{t.backToArchive}</Link>
             {" · "}
-            <Link href="/my-entries" style={styles.link}>My entries</Link>
+            <Link href="/my-entries" style={styles.link}>{t.navMyEntries}</Link>
           </p>
         </div>
       </main>
@@ -448,7 +456,7 @@ function ContributeForm() {
 
   const fld = (id, label, err, el) => (
     <>
-      <label style={styles.label} htmlFor={id}>{label}</label>
+      <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }} htmlFor={id}>{label}</label>
       {el(id)}
       {err && <p style={styles.error}>{err}</p>}
     </>
@@ -456,55 +464,58 @@ function ContributeForm() {
   return (
     <main style={styles.page}>
       <div style={styles.card}>
-        <Link href="/" style={styles.back}>← Back to Archive / ត្រឡប់ទៅទំព័រដើម</Link>
-        <h1 style={styles.title}>{isEdit ? "Edit Plant Entry" : "Contribute a Plant"}</h1>
-        <p style={styles.subtitle}>{isEdit ? "កែប្រែព័ត៌មានរុក្ខជាតិ" : "បញ្ចូលរុក្ខជាតិឱសថថ្មី"}</p>
-        {banner && <p style={styles.banner}>{banner}</p>}
+        <div style={styles.topBar}>
+          <Link href="/" style={styles.back}>{t.backToArchive}</Link>
+          <LanguageToggle />
+        </div>
+        <h1 style={styles.title}>{isEdit ? t.editEntryTitle : t.newEntryTitle}</h1>
+        <p style={styles.subtitle}>{isEdit ? t.contribSubtitleEdit : t.contribSubtitleNew}</p>
+        {banner && <p style={styles.banner}>{t[banner] ?? banner}</p>}
 
         <form onSubmit={handleSubmit} noValidate>
-          {fld("nameKhmer", "Khmer name *", errors.nameKhmer, (id) => (
+          {fld("nameKhmer", t.labelNameKhmer, errors.nameKhmer, (id) => (
             <input id={id} style={styles.input} value={form.nameKhmer}
               onChange={(e) => setField("nameKhmer", e.target.value)}
               onBlur={() => validateField("nameKhmer")} />
           ))}
 
-          {fld("title", "Common name (English) *", errors.title, (id) => (
+          {fld("title", t.labelTitle, errors.title, (id) => (
             <input id={id} style={styles.input} value={form.title}
               onChange={(e) => setField("title", e.target.value)}
               onBlur={() => validateField("title")} />
           ))}
 
-          {fld("scientificName", "Scientific name *  (genus alone, sp./spp., or Unidentified)", errors.scientificName, (id) => (
+          {fld("scientificName", t.labelScientific, errors.scientificName, (id) => (
             <input id={id} style={styles.input} value={form.scientificName}
               onChange={(e) => setField("scientificName", e.target.value)}
               onBlur={() => validateField("scientificName")} />
           ))}
 
-          {fld("family", "Family *  (-aceae, -oideae, or Unknown)", errors.family, (id) => (
+          {fld("family", t.labelFamily, errors.family, (id) => (
             <input id={id} style={styles.input} value={form.family}
               onChange={(e) => setField("family", e.target.value)}
               onBlur={() => validateField("family")} />
           ))}
 
-          {fld("description", "Description (morphology) *", errors.description, (id) => (
+          {fld("description", t.labelDescription, errors.description, (id) => (
             <textarea id={id} style={styles.textarea} value={form.description}
               onChange={(e) => setField("description", e.target.value)}
               onBlur={() => validateField("description")} />
           ))}
 
-          {fld("habitat", "Habitat & distribution *", errors.habitat, (id) => (
+          {fld("habitat", t.labelHabitat, errors.habitat, (id) => (
             <input id={id} style={styles.input} value={form.habitat}
               onChange={(e) => setField("habitat", e.target.value)}
               onBlur={() => validateField("habitat")} />
           ))}
 
-          {fld("medicinalUses", "Medicinal uses *", errors.medicinalUses, (id) => (
+          {fld("medicinalUses", t.labelUses, errors.medicinalUses, (id) => (
             <textarea id={id} style={styles.textarea} value={form.medicinalUses}
               onChange={(e) => setField("medicinalUses", e.target.value)}
               onBlur={() => validateField("medicinalUses")} />
           ))}
 
-          <label style={styles.label}>Chemical compounds *  (press Enter to add, 100 max)</label>
+          <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }}>{t.labelCompounds}</label>
           <TagInput
             value={form.chemicalCompounds}
             disabled={form.compoundsUnstudied}
@@ -515,16 +526,16 @@ function ContributeForm() {
           <label style={styles.checkboxRow}>
             <input type="checkbox" checked={form.compoundsUnstudied}
               onChange={(e) => setForm((f) => ({ ...f, compoundsUnstudied: e.target.checked, chemicalCompounds: e.target.checked ? [] : f.chemicalCompounds }))} />
-            Phytochemicals not yet formally studied / មិនទាន់មានការស្រាវជ្រាវគីមី
+            {t.compoundsUnstudied}
           </label>
 
-          {fld("dosage", "Dosage (optional)", errors.dosage, (id) => (
+          {fld("dosage", t.labelDosage, errors.dosage, (id) => (
             <textarea id={id} style={styles.textarea} value={form.dosage}
               onChange={(e) => setField("dosage", e.target.value)}
               onBlur={() => validateField("dosage")} />
           ))}
 
-          {fld("caution", "Caution / contraindications *", errors.caution, (id) => (
+          {fld("caution", t.labelCaution, errors.caution, (id) => (
             <textarea id={id} style={styles.textarea}
               value={form.caution} disabled={form.cautionNoneKnown}
               onChange={(e) => setField("caution", e.target.value)}
@@ -533,17 +544,17 @@ function ContributeForm() {
           <label style={styles.checkboxRow}>
             <input type="checkbox" checked={form.cautionNoneKnown}
               onChange={(e) => setForm((f) => ({ ...f, cautionNoneKnown: e.target.checked, caution: e.target.checked ? "" : f.caution }))} />
-            No specific contraindications recorded / មិនមានការកត់ត្រាការហាមឃាត់ជាក់លាក់
+            {t.cautionNoneKnown}
           </label>
 
-          <label style={styles.label} htmlFor="photo">Photo {isEdit ? "(optional)" : "*"}  (.jpg, .png, .webp, .gif — 5 MiB max)</label>
+          <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }} htmlFor="photo">{t.labelPhoto(isEdit)}</label>
           <input id="photo" type="file" accept=".jpg,.jpeg,.png,.webp,.gif"
             onChange={(e) => { setPhoto(e.target.files[0] || null); setErrors((er) => ({ ...er, photo: null })); }} />
           {errors.photo && <p style={styles.error}>{errors.photo}</p>}
 
           <button type="submit" disabled={busy !== null}
             style={{ ...styles.button, opacity: busy ? 0.6 : 1, cursor: busy ? "not-allowed" : "pointer" }}>
-            {busy === "photo" ? "Uploading photo…" : busy === "save" ? "Saving entry…" : "Submit entry"}
+            {busy === "photo" ? t.uploadingPhoto : busy === "save" ? t.savingEntry : t.submitEntry}
           </button>
         </form>
       </div>

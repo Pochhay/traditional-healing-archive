@@ -1,5 +1,8 @@
 "use client";
 
+import { useLanguage } from "./LanguageProvider.js";
+import { UI_TRANSLATIONS } from "../utils/translations.js";
+
 const styles = {
   overlay: {
     position: "fixed", inset: 0, backgroundColor: "rgba(0, 0, 0, 0.6)",
@@ -23,16 +26,18 @@ const styles = {
   },
 };
 
-export default function ConfirmModal({ open, message, confirmLabel = "Delete", onConfirm, onCancel }) {
+export default function ConfirmModal({ open, message, confirmLabel, onConfirm, onCancel }) {
+  const { lang } = useLanguage();
+  const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   if (!open) return null;
   return (
     <div style={styles.overlay} onClick={onCancel}>
       <div style={styles.card} onClick={(e) => e.stopPropagation()}>
-        <h3 style={styles.title}>Please confirm</h3>
+        <h3 style={styles.title}>{t.confirmTitle}</h3>
         <p style={styles.message}>{message}</p>
         <div style={styles.actions}>
-          <button type="button" onClick={onCancel} style={styles.cancel}>Cancel</button>
-          <button type="button" onClick={onConfirm} style={styles.confirm}>{confirmLabel}</button>
+          <button type="button" onClick={onCancel} style={styles.cancel}>{t.cancelBtn}</button>
+          <button type="button" onClick={onConfirm} style={styles.confirm}>{confirmLabel ?? t.deleteBtn}</button>
         </div>
       </div>
     </div>

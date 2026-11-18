@@ -1,4 +1,5 @@
 import collection from "../collection.config.js";
+import { LanguageProvider } from "../components/LanguageProvider.js";
 
 export const metadata = {
   title: collection.name,
@@ -19,7 +20,7 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Kantumruy+Pro:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
@@ -28,12 +29,11 @@ export default function RootLayout({ children }) {
           margin: 0,
           backgroundColor: "#0C1511",
           color: "#DBE5DE",
-          fontFamily:
-            "'Kantumruy Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          fontFamily: "'Kantumruy Pro', sans-serif",
           minHeight: "100vh",
         }}
       >
-        {children}
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   );

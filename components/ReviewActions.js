@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { createClient } from "../utils/supabase/client";
+import { useLanguage } from "./LanguageProvider.js";
+import { UI_TRANSLATIONS } from "../utils/translations.js";
 
 const supabase = createClient();
 
@@ -17,6 +19,8 @@ const S = {
 };
 
 export default function ReviewActions({ entry, onDecided }) {
+  const { lang } = useLanguage();
+  const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   const [busy, setBusy] = useState(null);
   const [failed, setFailed] = useState(false);
   const [returning, setReturning] = useState(false);
@@ -40,20 +44,20 @@ export default function ReviewActions({ entry, onDecided }) {
         <>
           <textarea style={S.note} value={note} autoFocus
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Reason for returning (optional) / មូលហេតុនៃការប្រគល់ (ស្រេចចិត្ត)" />
+            placeholder={t.returnNotePlaceholder} />
           <div style={S.actions}>
             <button type="button" disabled={busy !== null} onClick={() => review("returned", note.trim() || null)}
-              style={{ ...S.confirm, opacity: busy ? 0.6 : 1 }}>Confirm return / បញ្ជាក់ការប្រគល់</button>
-            <button type="button" onClick={() => setReturning(false)} style={S.cancel}>Cancel / បោះបង់</button>
+              style={{ ...S.confirm, opacity: busy ? 0.6 : 1 }}>{t.confirmReturnBtn}</button>
+            <button type="button" onClick={() => setReturning(false)} style={S.cancel}>{t.cancelBtn}</button>
           </div>
         </>
       ) : (
         <div style={S.actions}>
-          <button type="button" disabled={busy !== null} onClick={() => review("published")} style={S.publish}>Publish / ផ្សាយ</button>
-          <button type="button" disabled={busy !== null} onClick={() => setReturning(true)} style={S.ret}>Return / ប្រគល់ជូនវិញ</button>
+          <button type="button" disabled={busy !== null} onClick={() => review("published")} style={S.publish}>{t.publishBtn}</button>
+          <button type="button" disabled={busy !== null} onClick={() => setReturning(true)} style={S.ret}>{t.returnBtn}</button>
         </div>
       )}
-      {failed && <p style={S.err}>That decision was not saved. Please try again. / សម្រេចចិត្តមិនបានរក្សាទុកទេ។ សូមព្យាយាមម្តងទៀត។</p>}
+      {failed && <p style={S.err}>{t.reviewFailed}</p>}
     </div>
   );
 }

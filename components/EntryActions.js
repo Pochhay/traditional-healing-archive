@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "../utils/supabase/client";
 import ConfirmModal from "./ConfirmModal.js";
+import { useLanguage } from "./LanguageProvider.js";
+import { UI_TRANSLATIONS } from "../utils/translations.js";
 
 const supabase = createClient();
 
@@ -20,6 +22,8 @@ const styles = {
 };
 
 export default function EntryActions({ entry, onDelete }) {
+  const { lang } = useLanguage();
+  const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -32,18 +36,18 @@ export default function EntryActions({ entry, onDelete }) {
       onDelete(entry.id);
     } else {
       console.error("Delete failed or refused by policy:", error);
-      window.alert("That change wasn't saved");
+      window.alert(t.saveFailedAlert);
     }
   }
 
   return (
     <div style={styles.wrap}>
-      <Link href={`/contribute?id=${entry.id}`} style={styles.editLink}>Edit</Link>
-      <button type="button" onClick={() => setConfirmOpen(true)} style={styles.delBtn}>Delete</button>
+      <Link href={`/contribute?id=${entry.id}`} style={styles.editLink}>{t.editBtn}</Link>
+      <button type="button" onClick={() => setConfirmOpen(true)} style={styles.delBtn}>{t.deleteBtn}</button>
       <ConfirmModal
         open={confirmOpen}
-        message="Are you sure you want to delete this entry? This cannot be undone."
-        confirmLabel={deleting ? "Deleting…" : "Delete"}
+        message={t.confirmDeleteMsg}
+        confirmLabel={deleting ? t.deletingBtn : t.deleteBtn}
         onConfirm={handleDelete}
         onCancel={() => setConfirmOpen(false)}
       />

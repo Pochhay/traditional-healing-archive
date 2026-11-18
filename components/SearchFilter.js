@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { UI_TRANSLATIONS } from "../utils/translations.js";
+import { useLanguage } from "./LanguageProvider.js";
 
-const FILTERS = [
-  { id: "all", label: "All Taxa" }, { id: "name", label: "Names / ឈ្មោះ" }, { id: "family", label: "Family" },
-  { id: "uses", label: "Uses / ការប្រើប្រាស់" }, { id: "compounds", label: "Compounds" }, { id: "location", label: "Habitat" },
+const buildFilters = (t) => [
+  { id: "all", label: t.filterAll }, { id: "name", label: t.filterName }, { id: "family", label: t.filterFamily },
+  { id: "uses", label: t.filterUses }, { id: "compounds", label: t.filterCompounds }, { id: "location", label: t.filterLocation },
 ];
 
 const styles = {
@@ -26,11 +28,14 @@ const styles = {
     border: active ? "1px solid #B2D095" : "1px solid #2D4A3E",
     backgroundColor: active ? "#B2D095" : "#232C27", color: active ? "#0C1511" : "#C1C8C2",
   }),
-  count: { fontFamily: "'EB Garamond', Georgia, serif", fontSize: 13, color: "#9EB3A6", letterSpacing: 0.5 },
+  count: { fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 13, color: "#9EB3A6", letterSpacing: 0.5 },
 };
 
-export default function SearchFilter({ query, setQuery, activeField, setActiveField, resultCount, totalCount }) {
+export default function SearchFilter({ lang: langProp, query, setQuery, activeField, setActiveField, resultCount, totalCount }) {
+  const { lang: ctxLang } = useLanguage();
+  const lang = langProp ?? ctxLang;
   const [clearHovered, setClearHovered] = useState(false);
+  const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   return (
     <div style={styles.wrap}>
       <div style={styles.inputBox}>
@@ -40,10 +45,10 @@ export default function SearchFilter({ query, setQuery, activeField, setActiveFi
           </svg>
         </span>
         <input id="herbarium-search" type="text"
-          placeholder="Search by Khmer name, binomial, active compound, or indication..."
+          placeholder={t.searchPlaceholder}
           value={query} onChange={(e) => setQuery(e.target.value)} style={styles.input} />
         {query.length > 0 && (
-          <button type="button" aria-label="Clear search" onClick={() => setQuery("")}
+          <button type="button" aria-label={t.clearSearchLabel} onClick={() => setQuery("")}
             onMouseEnter={() => setClearHovered(true)} onMouseLeave={() => setClearHovered(false)}
             style={styles.clearBtn(clearHovered)}>
             ✕
@@ -52,14 +57,14 @@ export default function SearchFilter({ query, setQuery, activeField, setActiveFi
       </div>
       <div style={styles.pillRow}>
         <div style={styles.pills}>
-          {FILTERS.map((f) => (
+          {buildFilters(t).map((f) => (
             <button key={f.id} type="button" style={styles.pill(activeField === f.id)}
               onClick={() => setActiveField(activeField === f.id && f.id !== "all" ? "all" : f.id)}>
               {f.label}
             </button>
           ))}
         </div>
-        <span style={styles.count}>Displaying {resultCount} of {totalCount} Records</span>
+        <span style={{ ...styles.count, letterSpacing: lang === "km" ? 0 : 0.5 }}>{t.resultCount(resultCount, totalCount)}</span>
       </div>
     </div>
   );

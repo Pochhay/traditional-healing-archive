@@ -4,16 +4,19 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
 import EntryActions from "../../components/EntryActions.js";
+import LanguageToggle from "../../components/LanguageToggle.js";
+import { useLanguage } from "../../components/LanguageProvider.js";
+import { UI_TRANSLATIONS } from "../../utils/translations.js";
 
-const STATUS_LABELS = {
-  pending: "Pending review / កំពុងរង់ចាំការពិនិត្យ", published: "Published / បានផ្សព្វផ្សាយ",
-  returned: "Returned for revision / បានប្រគល់ជូនវិញ",
-};
+const statusLabel = (t, status) => (
+  { pending: t.statusPending, published: t.statusPublished, returned: t.statusReturned }[status] ?? status
+);
 
 const styles = {
   page: { minHeight: "100vh", backgroundColor: "#0C1511", padding: "40px 16px", fontFamily: "'Kantumruy Pro', sans-serif" },
   card: { maxWidth: 720, margin: "0 auto", backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
-  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none", marginBottom: 16 },
+  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none" },
+  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 },
   title: { color: "#E8ECE9", fontSize: 24, margin: "0 0 4px" },
   subtitle: { color: "#86B29B", fontSize: 14, margin: "0 0 24px" },
   row: { display: "flex", flexDirection: "column", gap: 10, padding: "14px 0", borderBottom: "1px solid #2D4A3E" },
@@ -27,6 +30,8 @@ const styles = {
 };
 
 export default function MyEntriesPage() {
+  const { lang } = useLanguage();
+  const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   const [entries, setEntries] = useState(null); // null = loading
   const [signedOut, setSignedOut] = useState(false);
   const [error, setError] = useState(false);
@@ -50,22 +55,25 @@ export default function MyEntriesPage() {
   return (
     <main style={styles.page}>
       <div style={styles.card}>
-        <Link href="/" style={styles.back}>← Back to Archive / ត្រឡប់ទៅទំព័រដើម</Link>
-        <h1 style={styles.title}>My entries</h1>
-        <p style={styles.subtitle}>រុក្ខជាតិរបស់ខ្ញុំ</p>
+        <div style={styles.topBar}>
+          <Link href="/" style={styles.back}>{t.backToArchive}</Link>
+          <LanguageToggle />
+        </div>
+        <h1 style={styles.title}>{t.myEntriesTitle}</h1>
+        <p style={styles.subtitle}>{t.myEntriesSubtitle}</p>
         {signedOut ? (
           <p style={styles.note}>
-            You must be signed in to view your entries. / សូមចូលគណនីដើម្បីមើលព័ត៌មានរបស់អ្នក។{" "}
-            <Link href="/login" style={styles.link}>Sign in / ចូលគណនី</Link>
+            {t.myEntriesSignedOut}{" "}
+            <Link href="/login" style={styles.link}>{t.navSignIn}</Link>
           </p>
         ) : error ? (
-          <p style={styles.note}>Could not load your entries. Please try again later. / មិនអាចទាញយកព័ត៌មានរបស់អ្នកបានទេ។ សូមព្យាយាមម្តងទៀត។</p>
+          <p style={styles.note}>{t.myEntriesError}</p>
         ) : entries === null ? (
-          <p style={styles.note}>Loading records… / កំពុងផ្ទុកព័ត៌មាន…</p>
+          <p style={styles.note}>{t.myEntriesLoading}</p>
         ) : entries.length === 0 ? (
           <p style={styles.note}>
-            You have not submitted any entries yet. / អ្នកមិនទាន់បានបញ្ចូលព័ត៌មាននៅឡើយទេ។{" "}
-            <Link href="/contribute" style={styles.link}>+ Contribute / + បញ្ចូលថ្មី</Link>
+            {t.myEntriesEmpty}{" "}
+            <Link href="/contribute" style={styles.link}>{t.navContribute}</Link>
           </p>
         ) : (
           entries.map((entry) => (
@@ -76,12 +84,12 @@ export default function MyEntriesPage() {
                   <p style={styles.sci}>{entry.scientific_name}</p>
                 </div>
                 <div style={styles.rowActions}>
-                  <span style={styles.badge}>{STATUS_LABELS[entry.status] ?? entry.status}</span>
+                  <span style={styles.badge}>{statusLabel(t, entry.status)}</span>
                   <EntryActions entry={entry} onDelete={removeEntry} />
                 </div>
               </div>
               {entry.status === "returned" && entry.review_note && (
-                <p style={styles.reviewerNote}>Reviewer note / ចំណាំពីអ្នកពិនិត្យ: {entry.review_note}</p>
+                <p style={styles.reviewerNote}>{t.reviewerNoteLabel} {entry.review_note}</p>
               )}
             </div>
           ))
