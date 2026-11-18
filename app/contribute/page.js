@@ -8,6 +8,8 @@ import TagInput from "../../components/TagInput.js";
 import LanguageToggle from "../../components/LanguageToggle.js";
 import { useLanguage } from "../../components/LanguageProvider.js";
 import { UI_TRANSLATIONS } from "../../utils/translations.js";
+import KhmerFieldsSection from "../../components/KhmerFieldsSection.js";
+import { KHMER_SPECIMEN_DATA } from "../../data/khmerEntries.js";
 
 const supabase = createClient();
 
@@ -74,6 +76,15 @@ function cleanMulti(raw) {
   if (CONTROL_RE.test(value)) return { error: "Control characters are not allowed." };
   if (TAG_LIKE_RE.test(value)) return { error: "Tag-like text (< ...) is not allowed." };
   return { value };
+}
+
+// Optional Khmer fields: empty is always valid; filled values face the same hygiene rules.
+function validateOptional(raw, max, multi) {
+  if (!normalizeText(raw)) return null;
+  const { value, error } = multi ? cleanMulti(raw) : cleanSingle(raw);
+  if (error) return error;
+  if (codepoints(value) > max) return `Must be ${max.toLocaleString()} characters or fewer.`;
+  return null;
 }
 
 /* ---------- Field validators (return an error string, or null) ---------- */
@@ -251,6 +262,12 @@ const VALIDATORS = {
   chemicalCompounds: (f) => validateCompounds(f.chemicalCompounds, f.compoundsUnstudied),
   dosage: (f) => validateDosage(f.dosage),
   caution: (f) => validateCaution(f.caution, f.cautionNoneKnown),
+  descriptionKm: (f) => validateOptional(f.descriptionKm, 5000, true),
+  habitatKm: (f) => validateOptional(f.habitatKm, 500, false),
+  medicinalUsesKm: (f) => validateOptional(f.medicinalUsesKm, 5000, true),
+  partsUsedKm: (f) => validateOptional(f.partsUsedKm, 300, false),
+  dosageKm: (f) => validateOptional(f.dosageKm, 1000, true),
+  cautionKm: (f) => validateOptional(f.cautionKm, 1000, true),
 };
 
 function ContributeForm() {
@@ -266,6 +283,7 @@ function ContributeForm() {
     nameKhmer: "", title: "", scientificName: "", family: "", description: "",
     habitat: "", medicinalUses: "", chemicalCompounds: [], dosage: "", caution: "",
     compoundsUnstudied: false, cautionNoneKnown: false,
+    descriptionKm: "", habitatKm: "", medicinalUsesKm: "", partsUsedKm: "", dosageKm: "", cautionKm: "",
   });
   const [photo, setPhoto] = useState(null);
   const [errors, setErrors] = useState({});
@@ -287,6 +305,7 @@ function ContributeForm() {
         setBanner("loadEntryFailed");
         return;
       }
+      const kmFallback = KHMER_SPECIMEN_DATA[data.scientific_name?.trim()];
       setForm({
         nameKhmer: data.name_khmer ?? "",
         title: data.title ?? "",
@@ -302,6 +321,12 @@ function ContributeForm() {
         caution: data.caution ?? "",
         compoundsUnstudied: data.chemical_compounds == null,
         cautionNoneKnown: data.caution == null,
+        descriptionKm: data.description_km ?? kmFallback?.description ?? "",
+        habitatKm: data.habitat_km ?? kmFallback?.location ?? "",
+        medicinalUsesKm: data.medicinal_uses_km ?? (kmFallback?.medicinalUses ? kmFallback.medicinalUses.join("\n") : ""),
+        partsUsedKm: data.parts_used_km ?? kmFallback?.partsUsed ?? "",
+        dosageKm: data.dosage_km ?? kmFallback?.dosage ?? "",
+        cautionKm: data.caution_km ?? kmFallback?.caution ?? "",
       });
       setLoadingEntry(false);
     });
@@ -355,6 +380,12 @@ function ContributeForm() {
         : form.chemicalCompounds.join("; ") || null,
       dosage: normalizeText(form.dosage) || null,
       caution: form.cautionNoneKnown ? null : normalizeText(form.caution),
+      description_km: normalizeText(form.descriptionKm) || null,
+      habitat_km: normalizeText(form.habitatKm) || null,
+      medicinal_uses_km: normalizeText(form.medicinalUsesKm) || null,
+      parts_used_km: normalizeText(form.partsUsedKm) || null,
+      dosage_km: normalizeText(form.dosageKm) || null,
+      caution_km: normalizeText(form.cautionKm) || null,
       contributor: u.user_metadata?.username || u.email || "Anonymous",
     };
 
@@ -546,6 +577,8 @@ function ContributeForm() {
               onChange={(e) => setForm((f) => ({ ...f, cautionNoneKnown: e.target.checked, caution: e.target.checked ? "" : f.caution }))} />
             {t.cautionNoneKnown}
           </label>
+
+          <KhmerFieldsSection form={form} errors={errors} setField={setField} onBlurField={validateField} />
 
           <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }} htmlFor="photo">{t.labelPhoto(isEdit)}</label>
           <input id="photo" type="file" accept=".jpg,.jpeg,.png,.webp,.gif"

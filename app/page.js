@@ -17,9 +17,10 @@ const PAGE_SIZE = 6;
 // mode, transcribed Plant_entry text from data/khmerEntries.js overrides the DB copy;
 // anything not transcribed (community entries) falls back to the English row.
 function mapEntry(row, currentLang) {
-  const km = KHMER_SPECIMEN_DATA[row.scientific_name?.trim()];
-  const useKm = currentLang === "km" && km;
+  const kmFallback = KHMER_SPECIMEN_DATA[row.scientific_name?.trim()];
+  const isKm = currentLang === "km";
   const dbUses = row.medicinal_uses ? row.medicinal_uses.split("\n").filter(Boolean) : [];
+  const kmUses = row.medicinal_uses_km ? row.medicinal_uses_km.split("\n").filter(Boolean) : null;
   return {
     id: row.id,
     owner: row.owner,
@@ -29,13 +30,14 @@ function mapEntry(row, currentLang) {
     family: row.family,
     image: row.photo_url,
     chemicalCompounds: row.chemical_compounds ? row.chemical_compounds.split(",").map((c) => c.trim()).filter(Boolean) : [],
-    nameKhmer: (useKm && km.nameKhmer) || row.name_khmer,
-    description: useKm ? km.description : row.description,
-    location: useKm ? km.location : row.habitat,
-    dosage: useKm ? km.dosage : row.dosage,
-    caution: useKm ? km.caution : row.caution, // km.caution may be null on purpose.
-    medicinalUses: useKm ? km.medicinalUses : dbUses,
-    partsUsed: useKm ? km.partsUsed ?? null : null,
+    nameKhmer: (isKm && kmFallback?.nameKhmer) || row.name_khmer,
+    // Khmer priority: submitted *_km → Plant_entry transcription → English DB row.
+    description: isKm ? row.description_km || kmFallback?.description || row.description : row.description,
+    location: isKm ? row.habitat_km || kmFallback?.location || row.habitat : row.habitat,
+    dosage: isKm ? row.dosage_km || kmFallback?.dosage || row.dosage : row.dosage,
+    caution: isKm ? row.caution_km || kmFallback?.caution || row.caution : row.caution, // never hide a warning
+    medicinalUses: isKm ? kmUses || kmFallback?.medicinalUses || dbUses : dbUses,
+    partsUsed: isKm ? row.parts_used_km || kmFallback?.partsUsed || null : null,
   };
 }
 

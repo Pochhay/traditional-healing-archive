@@ -1,6 +1,7 @@
 "use client";
 
 import ReviewActions from "./ReviewActions.js";
+import ReviewKmFields from "./ReviewKmFields.js";
 import { useLanguage } from "./LanguageProvider.js";
 import { UI_TRANSLATIONS } from "../utils/translations.js";
 
@@ -55,6 +56,7 @@ export default function ReviewCard({ entry, onDecided }) {
           {entry.caution && <div style={S.caution}><strong>{t.caution}:</strong> {entry.caution}</div>}
         </div>
       </div>
+      <ReviewKmFields entry={entry} />
       <ReviewActions entry={entry} onDecided={onDecided} />
     </article>
   );
