@@ -9,18 +9,20 @@ import { UI_TRANSLATIONS } from "../utils/translations.js";
 const makeStyles = (km) => ({
   header: { padding: "40px 0 20px", display: "flex", flexDirection: "column", gap: 16 },
   topRow: {
-    display: "flex", justifyContent: "space-between", alignItems: "center",
+    display: "flex", justifyContent: "space-between", alignItems: "flex-start",
     gap: 12, flexWrap: "wrap",
   },
-  badgeRow: {
-    display: "inline-flex", alignItems: "center", gap: 8,
-    backgroundColor: "#232C27", padding: "4px 12px", borderRadius: 4, width: "fit-content",
+  plaque: {
+    display: "flex", flexDirection: "column", gap: 2, width: "fit-content",
+    backgroundColor: "#141D19", border: "1px solid #2D4A3E", borderLeft: "3px solid #B2D095",
+    borderRadius: 4, padding: "8px 14px",
   },
-  pulseDot: { width: 8, height: 8, borderRadius: "50%", backgroundColor: "#B2D095" },
-  badgeText: {
-    fontSize: 11, letterSpacing: km ? 0 : 2, color: "#B2D095",
-    textTransform: km ? "none" : "uppercase", fontWeight: 600,
+  plaqueKh: { fontSize: 14, fontWeight: 600, color: "#B2D095", letterSpacing: 0, lineHeight: 1.4 },
+  plaqueEn: {
+    fontSize: 10, fontWeight: 500, color: "#86B29B",
+    letterSpacing: 1.6, textTransform: "uppercase", lineHeight: 1.3,
   },
+  divider: { borderTop: "1px solid #232C27" },
   title: { fontSize: 36, fontWeight: 500, color: "#A3D1B8", margin: "4px 0 2px", letterSpacing: km ? 0 : -0.5 },
   titleKhmer: { fontSize: 20, color: "#B2D095", fontWeight: 500, margin: "0 0 10px" },
   desc: { fontSize: 15, color: "#C1C8C2", lineHeight: 1.7, margin: 0 },
@@ -45,15 +47,14 @@ export default function HerbariumHeader({ lang: langProp, onToggleLang }) {
   return (
     <header style={styles.header}>
       <div style={styles.topRow}>
-        <div style={styles.badgeRow}>
-          <span style={styles.pulseDot} />
-          <span style={styles.badgeText}>{t.badge}</span>
+        <div style={styles.plaque}>
+          <span style={styles.plaqueKh}>{UI_TRANSLATIONS.km.badge}</span>
+          <span style={styles.plaqueEn}>{UI_TRANSLATIONS.en.badge}</span>
         </div>
         <LanguageToggle lang={lang} onToggle={onToggleLang} />
       </div>
-      <div style={styles.authRow}>
-        <AuthNav />
-      </div>
+      <div style={styles.authRow}><AuthNav /></div>
+      <div style={styles.divider} />
       <div>
         <h1 style={styles.title}>{lang === "km" ? collection.nameKm : collection.name}</h1>
         <p style={styles.titleKhmer}>{lang === "km" ? collection.name : collection.nameKm}</p>
