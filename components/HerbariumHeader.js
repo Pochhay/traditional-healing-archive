@@ -25,7 +25,7 @@ const makeStyles = (km) => ({
   titleKhmer: { fontSize: 20, color: "#B2D095", fontWeight: 500, margin: "0 0 10px" },
   desc: { fontSize: 15, color: "#C1C8C2", lineHeight: 1.7, margin: 0 },
   metaStack: { display: "flex", flexDirection: "column", gap: 12, marginTop: 6 },
-  topActions: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" },
+  authRow: { display: "flex", justifyContent: "flex-end", flexWrap: "wrap", gap: 10 },
   metaCard: {
     backgroundColor: "#18221D", border: "1px solid #2D4A3E",
     padding: "12px 16px", borderRadius: 4,
@@ -49,10 +49,10 @@ export default function HerbariumHeader({ lang: langProp, onToggleLang }) {
           <span style={styles.pulseDot} />
           <span style={styles.badgeText}>{t.badge}</span>
         </div>
-        <div style={styles.topActions}>
-          <LanguageToggle lang={lang} onToggle={onToggleLang} />
-          <AuthNav />
-        </div>
+        <LanguageToggle lang={lang} onToggle={onToggleLang} />
+      </div>
+      <div style={styles.authRow}>
+        <AuthNav />
       </div>
       <div>
         <h1 style={styles.title}>{lang === "km" ? collection.nameKm : collection.name}</h1>
