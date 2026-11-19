@@ -5,7 +5,6 @@ import HerbariumHeader from "../components/HerbariumHeader.js";
 import SearchFilter from "../components/SearchFilter.js";
 import EntryCard from "../components/EntryCard.js";
 import PaginationControls from "../components/PaginationControls.js";
-import { KHMER_SPECIMEN_DATA } from "../data/khmerEntries.js";
 import { UI_TRANSLATIONS } from "../utils/translations.js";
 import { useLanguage } from "../components/LanguageProvider.js";
 import { createClient } from "../utils/supabase/client";
@@ -14,10 +13,8 @@ const supabase = createClient();
 const PAGE_SIZE = 6;
 
 // Map a raw database row to the shape EntryCard / SpecimenDetails expect. In Khmer
-// mode, transcribed Plant_entry text from data/khmerEntries.js overrides the DB copy;
-// anything not transcribed (community entries) falls back to the English row.
+// mode the submitted *_km columns win; the English DB columns are the fallback.
 function mapEntry(row, currentLang) {
-  const kmFallback = KHMER_SPECIMEN_DATA[row.scientific_name?.trim()];
   const isKm = currentLang === "km";
   const dbUses = row.medicinal_uses ? row.medicinal_uses.split("\n").filter(Boolean) : [];
   const kmUses = row.medicinal_uses_km ? row.medicinal_uses_km.split("\n").filter(Boolean) : null;
@@ -30,14 +27,14 @@ function mapEntry(row, currentLang) {
     family: row.family,
     image: row.photo_url,
     chemicalCompounds: row.chemical_compounds ? row.chemical_compounds.split(",").map((c) => c.trim()).filter(Boolean) : [],
-    nameKhmer: (isKm && kmFallback?.nameKhmer) || row.name_khmer,
-    // Khmer priority: submitted *_km → Plant_entry transcription → English DB row.
-    description: isKm ? row.description_km || kmFallback?.description || row.description : row.description,
-    location: isKm ? row.habitat_km || kmFallback?.location || row.habitat : row.habitat,
-    dosage: isKm ? row.dosage_km || kmFallback?.dosage || row.dosage : row.dosage,
-    caution: isKm ? row.caution_km || kmFallback?.caution || row.caution : row.caution, // never hide a warning
-    medicinalUses: isKm ? kmUses || kmFallback?.medicinalUses || dbUses : dbUses,
-    partsUsed: isKm ? row.parts_used_km || kmFallback?.partsUsed || null : null,
+    nameKhmer: row.name_khmer,
+    // Khmer mode: submitted *_km columns, falling back to the English DB row.
+    description: isKm ? row.description_km || row.description : row.description,
+    location: isKm ? row.habitat_km || row.habitat : row.habitat,
+    dosage: isKm ? row.dosage_km || row.dosage : row.dosage,
+    caution: isKm ? row.caution_km || row.caution : row.caution, // never hide a warning
+    medicinalUses: isKm ? kmUses || dbUses : dbUses,
+    partsUsed: isKm ? row.parts_used_km || null : null,
   };
 }
 
@@ -98,7 +95,7 @@ export default function Home() {
   const shown = filtered.slice(0, visible);
 
   return (
-    <main style={styles.wrap}>
+    <main className="archive-main" style={styles.wrap}>
       <HerbariumHeader />
       <SearchFilter
         lang={lang}

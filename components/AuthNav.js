@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "../utils/supabase/client";
 import { useLanguage } from "./LanguageProvider.js";
@@ -9,38 +9,25 @@ import { UI_TRANSLATIONS } from "../utils/translations.js";
 
 const supabase = createClient();
 
-const styles = {
-  nav: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" },
-  email: { fontSize: 12, color: "#86B29B" },
-  chip: {
-    fontSize: 12, color: "#DBE5DE", textDecoration: "none", padding: "4px 12px",
-    backgroundColor: "#232C27", border: "1px solid #2D4A3E", borderRadius: 4,
-    fontWeight: 500,
-  },
-  chipPrimary: {
-    fontSize: 12, color: "#B2D095", textDecoration: "none", padding: "4px 12px",
-    backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4,
-    fontWeight: 600,
-  },
-  button: {
-    fontSize: 12, color: "#DBE5DE", backgroundColor: "#232C27", border: "1px solid #2D4A3E",
-    borderRadius: 4, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit",
-  },
-};
-
 export default function AuthNav() {
   const router = useRouter();
+  const pathname = usePathname();
   const { lang } = useLanguage();
   const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   const [email, setEmail] = useState(undefined); // undefined = checking, null = logged out
   const [reviewer, setReviewer] = useState(false);
-  const [hover, setHover] = useState("");
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
-    supabase.rpc("is_reviewer").then(({ data }) => setReviewer(data === true));
+    const checkReviewer = () =>
+      supabase.rpc("is_reviewer").then(({ data }) => setReviewer(data === true));
+    supabase.auth.getUser().then(({ data }) => {
+      setEmail(data.user?.email ?? null);
+      if (data.user) checkReviewer();
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setEmail(session?.user?.email ?? null);
+      if (session?.user) checkReviewer();
+      else setReviewer(false);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -50,29 +37,36 @@ export default function AuthNav() {
     router.refresh();
   }
 
-  const hoverProps = (id, base) => ({
-    onMouseEnter: () => setHover(id),
-    onMouseLeave: () => setHover(""),
-    style: { ...base, color: hover === id ? "#C8E6A9" : base.color },
-  });
-
   if (email === undefined) return null;
 
+  const isActive = (href) => pathname === href || pathname?.startsWith(`${href}/`);
+  const navClass = (href, base) => (isActive(href) ? `${base} nav-active` : base);
+  const current = (href) => (isActive(href) ? "page" : undefined);
+
   return (
-    <nav style={styles.nav}>
+    <nav className="auth-nav" aria-label="Primary navigation">
       {email ? (
         <>
-          <Link href="/contribute" {...hoverProps("contribute", styles.chipPrimary)}>{t.navContribute}</Link>
-          <Link href="/my-entries" {...hoverProps("myentries", styles.chip)}>{t.navMyEntries}</Link>
-          {reviewer && <Link href="/review" {...hoverProps("review", styles.chip)}>{t.navReview}</Link>}
-          <span style={styles.email}>{email}</span>
-          <button type="button" onClick={handleLogout} {...hoverProps("logout", styles.button)}>{t.navLogout}</button>
+          <Link href="/contribute" className={navClass("/contribute", "nav-cta")} aria-current={current("/contribute")}>
+            {t.navContribute}
+          </Link>
+          <Link href="/my-entries" className={navClass("/my-entries", "nav-link")} aria-current={current("/my-entries")}>
+            {t.navMyEntries}
+          </Link>
+          {reviewer && (
+            <Link href="/review" className={navClass("/review", "nav-link")} aria-current={current("/review")}>
+              {t.navReview}
+            </Link>
+          )}
+          <div className="nav-account">
+            <span className="nav-email" title={email}>{email}</span>
+            <button type="button" onClick={handleLogout} className="nav-logout">{t.navLogout}</button>
+          </div>
         </>
       ) : (
-        <>
-          <Link href="/login" {...hoverProps("signin", styles.chip)}>{t.navSignIn}</Link>
-          <Link href="/signup" {...hoverProps("signup", styles.chipPrimary)}>{t.navSignUp}</Link>
-        </>
+        <Link href="/login" className={navClass("/login", "nav-cta")} aria-current={current("/login")}>
+          {t.navSignIn}
+        </Link>
       )}
     </nav>
   );

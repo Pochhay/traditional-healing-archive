@@ -3,7 +3,7 @@ import { UI_TRANSLATIONS } from "../utils/translations.js";
 import { useLanguage } from "./LanguageProvider.js";
 
 const styles = {
-  wrap: { display: "flex", flexDirection: "column", gap: 12, flex: "1 1 340px" },
+  wrap: { display: "flex", flexDirection: "column", gap: 12, flex: "1 1 340px", minWidth: 0, overflowWrap: "anywhere" },
   header: { borderBottom: "1px solid #2D4A3E", paddingBottom: 8 },
   khmer: { fontSize: 24, fontWeight: 600, color: "#A3D1B8", margin: "0 0 2px" },
   english: { fontSize: 16, fontWeight: 500, color: "#DBE5DE", margin: "0 0 2px" },
@@ -30,7 +30,7 @@ export default function SpecimenDetails({ entry, query = "", lang: langProp }) {
   // Khmer vowel signs and subscripts must not be spaced or upper-cased.
   const label = { ...styles.label, letterSpacing: lang === "km" ? 0 : 1.2, textTransform: lang === "km" ? "none" : "uppercase" };
   return (
-    <div style={styles.wrap}>
+    <div className="specimen-details" style={styles.wrap}>
       <div style={styles.header}>
         <h2 style={styles.khmer}><HighlightText text={nameKhmer} query={query} /></h2>
         <p style={styles.english}><HighlightText text={nameEnglish} query={query} /></p>

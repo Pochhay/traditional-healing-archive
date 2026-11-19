@@ -4,17 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
-import LanguageToggle from "../../components/LanguageToggle.js";
+import BackLink from "../../components/BackLink.js";
 import { useLanguage } from "../../components/LanguageProvider.js";
 import { UI_TRANSLATIONS } from "../../utils/translations.js";
 
 const supabase = createClient();
 
 const styles = {
-  page: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 },
+  page: { minHeight: "calc(100vh - 68px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 },
   card: { width: "100%", maxWidth: 400, backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
-  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none" },
-  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 },
+  topBar: { display: "flex", alignItems: "center", marginBottom: 18 },
   title: { fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 28, margin: "0 0 4px" },
   subtitle: { fontSize: 14, color: "#86B29B", margin: "0 0 24px" },
   label: { display: "block", fontSize: 12, color: "#86B29B", letterSpacing: 0.5, marginBottom: 6 },
@@ -61,11 +60,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div style={styles.page}>
-      <form style={styles.card} onSubmit={handleSubmit}>
+    <main className="subpage-shell" style={styles.page}>
+      <form className="subpage-card" style={styles.card} onSubmit={handleSubmit}>
         <div style={styles.topBar}>
-          <Link href="/" style={styles.back}>{t.backToArchive}</Link>
-          <LanguageToggle />
+          <BackLink />
         </div>
         <h1 style={styles.title}>{t.signupTitle}</h1>
         <p style={styles.subtitle}>{t.signupSubtitle}</p>
@@ -81,6 +79,6 @@ export default function SignupPage() {
           {t.haveAccount} <Link href="/login" style={styles.link}>{t.navSignIn}</Link>
         </p>
       </form>
-    </div>
+    </main>
   );
 }

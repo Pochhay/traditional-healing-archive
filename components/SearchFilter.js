@@ -25,6 +25,7 @@ const styles = {
   pills: { display: "flex", flexWrap: "wrap", gap: 6 },
   pill: (active) => ({
     padding: "5px 11px", borderRadius: 4, fontSize: 12, fontWeight: active ? 600 : 400, cursor: "pointer",
+    fontFamily: "inherit", // buttons do not inherit body fonts by default
     border: active ? "1px solid #B2D095" : "1px solid #2D4A3E",
     backgroundColor: active ? "#B2D095" : "#232C27", color: active ? "#0C1511" : "#C1C8C2",
   }),
@@ -37,14 +38,14 @@ export default function SearchFilter({ lang: langProp, query, setQuery, activeFi
   const [clearHovered, setClearHovered] = useState(false);
   const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   return (
-    <div style={styles.wrap}>
+    <div className="search-box" style={styles.wrap}>
       <div style={styles.inputBox}>
-        <span style={styles.icon}>
+        <span className="search-icon" style={styles.icon}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </span>
-        <input id="herbarium-search" type="text"
+        <input id="herbarium-search" className="search-input" type="text"
           placeholder={t.searchPlaceholder}
           value={query} onChange={(e) => setQuery(e.target.value)} style={styles.input} />
         {query.length > 0 && (

@@ -6,34 +6,36 @@ const styles = {
   wrap: {
     display: "inline-flex",
     alignItems: "center",
-    backgroundColor: "#18221D",
-    border: "1px solid #2D4A3E",
-    borderRadius: 20,
-    padding: "2px 4px",
+    backgroundColor: "#121B17",
+    border: "1px solid #24382E",
+    borderRadius: 6,
+    padding: 2,
     gap: 2,
   },
   btn: {
     background: "transparent",
-    border: "none",
+    border: "1px solid transparent",
     color: "#86B29B",
     fontSize: 12,
     fontWeight: 500,
     padding: "4px 10px",
-    borderRadius: 14,
+    borderRadius: 4,
     cursor: "pointer",
     fontFamily: "inherit",
-    transition: "all 0.2s ease",
+    whiteSpace: "nowrap",
+    transition: "color 0.15s ease",
   },
   active: {
-    backgroundColor: "#232C27",
-    color: "#B2D095",
-    border: "1px solid #2D4A3E",
+    backgroundColor: "#203229",
+    border: "1px solid #2E4B3D",
+    color: "#C8E6A9",
     fontSize: 12,
     fontWeight: 600,
     padding: "4px 10px",
-    borderRadius: 14,
+    borderRadius: 4,
     cursor: "pointer",
     fontFamily: "inherit",
+    whiteSpace: "nowrap",
   },
 };
 
@@ -43,19 +45,11 @@ export default function LanguageToggle({ lang, onToggle }) {
   const activeLang = lang ?? ctxLang;
   const toggle = onToggle ?? ctxSetLang;
   return (
-    <div style={styles.wrap} role="group" aria-label="Language selector">
-      <button
-        type="button"
-        style={activeLang === "km" ? styles.active : styles.btn}
-        onClick={() => toggle("km")}
-      >
+    <div className="lang-toggle" style={styles.wrap} role="group" aria-label="Language selector">
+      <button type="button" className="lang-btn" style={activeLang === "km" ? styles.active : styles.btn} onClick={() => toggle("km")}>
         ភាសាខ្មែរ
       </button>
-      <button
-        type="button"
-        style={activeLang === "en" ? styles.active : styles.btn}
-        onClick={() => toggle("en")}
-      >
+      <button type="button" className="lang-btn" style={activeLang === "en" ? styles.active : styles.btn} onClick={() => toggle("en")}>
         English
       </button>
     </div>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
 import EntryActions from "../../components/EntryActions.js";
-import LanguageToggle from "../../components/LanguageToggle.js";
+import BackLink from "../../components/BackLink.js";
 import { useLanguage } from "../../components/LanguageProvider.js";
 import { UI_TRANSLATIONS } from "../../utils/translations.js";
 
@@ -13,10 +13,9 @@ const statusLabel = (t, status) => (
 );
 
 const styles = {
-  page: { minHeight: "100vh", backgroundColor: "#0C1511", padding: "40px 16px", fontFamily: "'Kantumruy Pro', sans-serif" },
+  page: { minHeight: "calc(100vh - 68px)", backgroundColor: "#0C1511", padding: "28px 16px 48px", fontFamily: "'Kantumruy Pro', sans-serif" },
   card: { maxWidth: 720, margin: "0 auto", backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
-  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none" },
-  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 },
+  topBar: { display: "flex", alignItems: "center", marginBottom: 18 },
   title: { color: "#E8ECE9", fontSize: 24, margin: "0 0 4px" },
   subtitle: { color: "#86B29B", fontSize: 14, margin: "0 0 24px" },
   row: { display: "flex", flexDirection: "column", gap: 10, padding: "14px 0", borderBottom: "1px solid #2D4A3E" },
@@ -53,11 +52,10 @@ export default function MyEntriesPage() {
   }, []);
 
   return (
-    <main style={styles.page}>
-      <div style={styles.card}>
+    <main className="subpage-shell" style={styles.page}>
+      <div className="subpage-card" style={styles.card}>
         <div style={styles.topBar}>
-          <Link href="/" style={styles.back}>{t.backToArchive}</Link>
-          <LanguageToggle />
+          <BackLink />
         </div>
         <h1 style={styles.title}>{t.myEntriesTitle}</h1>
         <p style={styles.subtitle}>{t.myEntriesSubtitle}</p>

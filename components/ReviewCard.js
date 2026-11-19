@@ -12,7 +12,7 @@ const S = {
   sci: { fontFamily: "'Kantumruy Pro', sans-serif", fontStyle: "italic", fontSize: 13, color: "#B2D095", margin: 0 },
   body: { display: "flex", flexWrap: "wrap", gap: 16 },
   photo: { width: 180, height: 130, objectFit: "cover", borderRadius: 3, border: "1px solid #2D4A3E", backgroundColor: "#0C1511" },
-  fields: { flex: "1 1 320px", display: "flex", flexDirection: "column", gap: 8 },
+  fields: { flex: "1 1 320px", display: "flex", flexDirection: "column", gap: 8, minWidth: 0, overflowWrap: "anywhere" },
   label: { fontSize: 10.5, letterSpacing: 1, color: "#86B29B", textTransform: "uppercase", margin: "0 0 2px" },
   text: { fontSize: 13, color: "#DBE5DE", lineHeight: 1.6, margin: 0 },
   tags: { display: "flex", flexWrap: "wrap", gap: 5 },
@@ -30,7 +30,7 @@ export default function ReviewCard({ entry, onDecided }) {
   const compounds = (entry.chemical_compounds || "").split(/[;\n]/).map((c) => c.trim()).filter(Boolean);
 
   return (
-    <article style={S.card}>
+    <article className="review-card" style={S.card}>
       <div style={S.head}>
         <div>
           <h2 style={S.khmer}>{entry.name_khmer}</h2>
@@ -39,8 +39,8 @@ export default function ReviewCard({ entry, onDecided }) {
         <span style={S.sci}>{entry.contributor} · {new Date(entry.created_at).toLocaleDateString(lang === "km" ? "km-KH" : "en-US")}</span>
       </div>
       <div style={S.body}>
-        {entry.photo_url && <img src={entry.photo_url} alt={entry.name_khmer} style={S.photo} />}
-        <div style={S.fields}>
+        {entry.photo_url && <img src={entry.photo_url} alt={entry.name_khmer} className="review-photo" style={S.photo} />}
+        <div className="review-fields" style={S.fields}>
           <Field label={t.reviewDesc} value={entry.description} style={label} />
           <Field label={t.reviewHabitat} value={entry.habitat} style={label} />
           <div>

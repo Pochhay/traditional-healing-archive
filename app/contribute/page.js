@@ -5,11 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
 import TagInput from "../../components/TagInput.js";
-import LanguageToggle from "../../components/LanguageToggle.js";
+import BackLink from "../../components/BackLink.js";
 import { useLanguage } from "../../components/LanguageProvider.js";
 import { UI_TRANSLATIONS } from "../../utils/translations.js";
 import KhmerFieldsSection from "../../components/KhmerFieldsSection.js";
-import { KHMER_SPECIMEN_DATA } from "../../data/khmerEntries.js";
 
 const supabase = createClient();
 
@@ -227,11 +226,10 @@ const input = {
 };
 
 const styles = {
-  page: { minHeight: "100vh", maxWidth: 720, margin: "0 auto", padding: "40px 20px 80px" },
+  page: { minHeight: "calc(100vh - 68px)", maxWidth: 720, margin: "0 auto", padding: "28px 20px 80px" },
   gateCard: { backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px", textAlign: "center" },
   card: { backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
-  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none" },
-  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 },
+  topBar: { display: "flex", alignItems: "center", marginBottom: 18 },
   title: { fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 28, color: "#DBE5DE", margin: "0 0 4px" },
   subtitle: { fontSize: 14, color: "#86B29B", margin: "0 0 24px" },
   label: { display: "block", fontSize: 12, color: "#86B29B", letterSpacing: 0.5, margin: "16px 0 6px" },
@@ -305,7 +303,6 @@ function ContributeForm() {
         setBanner("loadEntryFailed");
         return;
       }
-      const kmFallback = KHMER_SPECIMEN_DATA[data.scientific_name?.trim()];
       setForm({
         nameKhmer: data.name_khmer ?? "",
         title: data.title ?? "",
@@ -321,12 +318,12 @@ function ContributeForm() {
         caution: data.caution ?? "",
         compoundsUnstudied: data.chemical_compounds == null,
         cautionNoneKnown: data.caution == null,
-        descriptionKm: data.description_km ?? kmFallback?.description ?? "",
-        habitatKm: data.habitat_km ?? kmFallback?.location ?? "",
-        medicinalUsesKm: data.medicinal_uses_km ?? (kmFallback?.medicinalUses ? kmFallback.medicinalUses.join("\n") : ""),
-        partsUsedKm: data.parts_used_km ?? kmFallback?.partsUsed ?? "",
-        dosageKm: data.dosage_km ?? kmFallback?.dosage ?? "",
-        cautionKm: data.caution_km ?? kmFallback?.caution ?? "",
+        descriptionKm: data.description_km ?? "",
+        habitatKm: data.habitat_km ?? "",
+        medicinalUsesKm: data.medicinal_uses_km ?? "",
+        partsUsedKm: data.parts_used_km ?? "",
+        dosageKm: data.dosage_km ?? "",
+        cautionKm: data.caution_km ?? "",
       });
       setLoadingEntry(false);
     });
@@ -433,14 +430,14 @@ function ContributeForm() {
     }
   }
 
-  if (user === undefined) return <main style={styles.page} />;
+  if (user === undefined) return <main className="subpage-shell" style={styles.page} />;
 
   if (user === null) {
     return (
-      <main style={styles.page}>
-        <div style={styles.gateCard}>
-          <div style={{ ...styles.topBar, justifyContent: "flex-end" }}>
-            <LanguageToggle />
+      <main className="subpage-shell" style={styles.page}>
+        <div className="subpage-card" style={styles.gateCard}>
+          <div style={styles.topBar}>
+            <BackLink />
           </div>
           <h1 style={styles.title}>{t.contribGateTitle}</h1>
           <p style={{ color: "#86B29B", margin: "12px 0 24px" }}>
@@ -458,8 +455,8 @@ function ContributeForm() {
 
   if (loadingEntry) {
     return (
-      <main style={styles.page}>
-        <div style={styles.card}>
+      <main className="subpage-shell" style={styles.page}>
+        <div className="subpage-card" style={styles.card}>
           <p style={{ color: "#86B29B", margin: 0 }}>{t.loadingEntry}</p>
         </div>
       </main>
@@ -468,16 +465,14 @@ function ContributeForm() {
 
   if (submitted) {
     return (
-      <main style={styles.page}>
-        <div style={styles.card}>
-          <div style={{ ...styles.topBar, justifyContent: "flex-end" }}>
-            <LanguageToggle />
+      <main className="subpage-shell" style={styles.page}>
+        <div className="subpage-card" style={styles.card}>
+          <div style={styles.topBar}>
+            <BackLink />
           </div>
           <h1 style={styles.title}>{t.submittedTitle}</h1>
           <p style={{ ...styles.subtitle, lineHeight: 1.8 }}>{t.submittedDesc}</p>
           <p style={{ margin: 0 }}>
-            <Link href="/" style={styles.link}>{t.backToArchive}</Link>
-            {" · "}
             <Link href="/my-entries" style={styles.link}>{t.navMyEntries}</Link>
           </p>
         </div>
@@ -493,11 +488,10 @@ function ContributeForm() {
     </>
   );
   return (
-    <main style={styles.page}>
-      <div style={styles.card}>
+    <main className="subpage-shell" style={styles.page}>
+      <div className="subpage-card" style={styles.card}>
         <div style={styles.topBar}>
-          <Link href="/" style={styles.back}>{t.backToArchive}</Link>
-          <LanguageToggle />
+          <BackLink />
         </div>
         <h1 style={styles.title}>{isEdit ? t.editEntryTitle : t.newEntryTitle}</h1>
         <p style={styles.subtitle}>{isEdit ? t.contribSubtitleEdit : t.contribSubtitleNew}</p>
@@ -597,7 +591,7 @@ function ContributeForm() {
 
 export default function ContributePage() {
   return (
-    <Suspense fallback={<main style={styles.page} />}>
+    <Suspense fallback={<main className="subpage-shell" style={styles.page} />}>
       <ContributeForm />
     </Suspense>
   );

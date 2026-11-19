@@ -44,7 +44,7 @@ export default function EntryCard({ entry, user, onDelete, query = "", lang: lan
   const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   const isOwner = user && user.id === owner;
   return (
-    <article style={styles.card}>
+    <article className="entry-card" style={styles.card}>
       <div style={styles.ribbon}>
         <span style={{ fontSize: 11, color: "#86B29B", letterSpacing: lang === "km" ? 0 : 0.5 }}>{t.contributorBy}: {contributor}</span>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
@@ -53,9 +53,9 @@ export default function EntryCard({ entry, user, onDelete, query = "", lang: lan
         </div>
       </div>
       <div style={styles.body}>
-        <div style={styles.photoPane}>
+        <div className="entry-photo-pane" style={styles.photoPane}>
           {image && (
-            <img src={image} alt={`${nameEnglish} (${nameKhmer})`} style={styles.photo} />
+            <img src={image} alt={`${nameEnglish} (${nameKhmer})`} className="entry-photo" style={styles.photo} />
           )}
           {location && (
             <div style={styles.habitatBox}>

@@ -1,5 +1,7 @@
+import "./globals.css";
 import collection from "../collection.config.js";
 import { LanguageProvider } from "../components/LanguageProvider.js";
+import SiteHeader from "../components/SiteHeader.js";
 
 export const metadata = {
   title: collection.name,
@@ -33,7 +35,10 @@ export default function RootLayout({ children }) {
           minHeight: "100vh",
         }}
       >
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <SiteHeader />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

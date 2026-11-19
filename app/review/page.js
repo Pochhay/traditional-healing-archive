@@ -1,20 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
 import ReviewCard from "../../components/ReviewCard.js";
-import LanguageToggle from "../../components/LanguageToggle.js";
+import BackLink from "../../components/BackLink.js";
 import { useLanguage } from "../../components/LanguageProvider.js";
 import { UI_TRANSLATIONS } from "../../utils/translations.js";
 
 const supabase = createClient();
 
 const styles = {
-  page: { minHeight: "100vh", backgroundColor: "#0C1511", padding: "40px 16px", fontFamily: "'Kantumruy Pro', sans-serif" },
+  page: { minHeight: "calc(100vh - 68px)", backgroundColor: "#0C1511", padding: "28px 16px 48px", fontFamily: "'Kantumruy Pro', sans-serif" },
   wrap: { maxWidth: 860, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 },
-  back: { display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#86B29B", textDecoration: "none" },
-  topBar: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 },
+  topBar: { display: "flex", alignItems: "center", marginBottom: 4 },
   title: { color: "#E8ECE9", fontSize: 24, margin: "0 0 4px" },
   subtitle: { color: "#86B29B", fontSize: 14, margin: "0 0 24px" },
   note: { color: "#86B29B", margin: 0, lineHeight: 1.8 },
@@ -47,30 +45,29 @@ export default function ReviewPage() {
   const remove = (id) => setQueue((prev) => prev.filter((e) => e.id !== id));
 
   return (
-    <main style={styles.page}>
+    <main className="subpage-shell" style={styles.page}>
       <div style={styles.wrap}>
         <div style={styles.topBar}>
-          <Link href="/" style={styles.back}>{t.backToArchive}</Link>
-          <LanguageToggle />
+          <BackLink />
         </div>
         <h1 style={styles.title}>{t.reviewTitle}</h1>
         <p style={styles.subtitle}>{t.reviewSubtitle}</p>
         {state === "loading" && <p style={styles.note}>{t.reviewLoading}</p>}
         {state === "denied" && (
-          <div style={styles.gate}>
+          <div className="subpage-card" style={styles.gate}>
             <p style={styles.note}>{t.reviewDenied}</p>
-            <p style={{ margin: "12px 0 0" }}>
-              <Link href="/" style={styles.link}>{t.backToArchive}</Link>
-            </p>
+            <div style={{ marginTop: 14 }}>
+              <BackLink />
+            </div>
           </div>
         )}
         {state === "error" && (
-          <div style={styles.gate}>
+          <div className="subpage-card" style={styles.gate}>
             <p style={styles.note}>{t.reviewError}</p>
           </div>
         )}
         {state === "ready" && queue.length === 0 && (
-          <div style={styles.gate}>
+          <div className="subpage-card" style={styles.gate}>
             <p style={styles.note}>{t.reviewEmpty}</p>
           </div>
         )}
