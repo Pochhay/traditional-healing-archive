@@ -12,25 +12,25 @@ const supabase = createClient();
 
 const styles = {
   page: { minHeight: "calc(100vh - 68px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 },
-  card: { width: "100%", maxWidth: 400, backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
-  topBar: { display: "flex", alignItems: "center", marginBottom: 18 },
-  title: { fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 28, margin: "0 0 4px" },
+  wrap: { width: "100%", maxWidth: 400, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 },
+  card: { width: "100%", backgroundColor: "#141D19", border: "1px solid #24382E", borderRadius: 8, padding: "32px 28px" },
+  title: { fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 26, fontWeight: 600, color: "#E8ECE9", margin: "0 0 6px" },
   subtitle: { fontSize: 14, color: "#86B29B", margin: "0 0 24px" },
   label: { display: "block", fontSize: 12, color: "#86B29B", letterSpacing: 0.5, marginBottom: 6 },
   input: {
-    width: "100%", boxSizing: "border-box", backgroundColor: "#07100C", border: "1px solid #2D4A3E",
-    borderRadius: 4, color: "#DBE5DE", fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 15, padding: "10px 12px", marginBottom: 16,
+    width: "100%", boxSizing: "border-box", backgroundColor: "#0B130F", border: "1px solid #24382E",
+    borderRadius: 6, color: "#DBE5DE", fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 15, padding: "10px 12px", marginBottom: 16,
   },
   error: {
     backgroundColor: "rgba(255, 180, 171, 0.1)", border: "1px solid rgba(255, 180, 171, 0.3)",
-    color: "#FFB4AB", borderRadius: 4, fontSize: 14, padding: "10px 12px", marginBottom: 16,
+    color: "#FFB4AB", borderRadius: 6, fontSize: 14, padding: "10px 12px", marginBottom: 16,
   },
   button: {
     width: "100%", backgroundColor: "#B2D095", color: "#0C1511", fontWeight: 600, border: "none",
-    borderRadius: 4, cursor: "pointer", fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 15, padding: "12px 0",
+    borderRadius: 6, cursor: "pointer", fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 15, padding: "12px 0", marginTop: 4,
   },
-  links: { marginTop: 20, fontSize: 13, color: "#86B29B", textAlign: "center" },
-  link: { color: "#86B29B" },
+  links: { margin: "20px 0 0", fontSize: 13, color: "#86B29B", textAlign: "center" },
+  link: { color: "#B2D095", fontWeight: 500, textDecoration: "none" },
 };
 
 export default function LoginPage() {
@@ -56,22 +56,22 @@ export default function LoginPage() {
 
   return (
     <main className="subpage-shell" style={styles.page}>
-      <form className="subpage-card" style={styles.card} onSubmit={handleSubmit}>
-        <div style={styles.topBar}>
-          <BackLink />
-        </div>
-        <h1 style={styles.title}>{t.loginTitle}</h1>
-        <p style={styles.subtitle}>{t.loginSubtitle}</p>
-        {error && <p style={styles.error}>{error}</p>}
-        <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }} htmlFor="email">{t.emailLabel}</label>
-        <input id="email" type="email" style={styles.input} value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
-        <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }} htmlFor="password">{t.passwordLabel}</label>
-        <input id="password" type="password" style={styles.input} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
-        <button type="submit" style={styles.button} disabled={loading}>{loading ? t.signingIn : t.loginTitle}</button>
-        <p style={styles.links}>
-          {t.needAccount} <Link href="/signup" style={styles.link}>{t.navSignUp}</Link>
-        </p>
-      </form>
+      <div style={styles.wrap}>
+        <form className="subpage-card" style={styles.card} onSubmit={handleSubmit}>
+          <h1 style={styles.title}>{t.loginTitle}</h1>
+          <p style={styles.subtitle}>{t.loginSubtitle}</p>
+          {error && <p style={styles.error}>{error}</p>}
+          <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }} htmlFor="email">{t.emailLabel}</label>
+          <input id="email" type="email" style={styles.input} value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
+          <label style={{ ...styles.label, letterSpacing: lang === "km" ? 0 : 0.5 }} htmlFor="password">{t.passwordLabel}</label>
+          <input id="password" type="password" style={styles.input} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+          <button type="submit" style={styles.button} disabled={loading}>{loading ? t.signingIn : t.loginTitle}</button>
+          <p style={styles.links}>
+            {t.needAccount} <Link href="/signup" style={styles.link}>{t.navSignUp}</Link>
+          </p>
+        </form>
+        <BackLink subtle />
+      </div>
     </main>
   );
 }

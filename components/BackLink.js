@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useLanguage } from "./LanguageProvider.js";
 import { UI_TRANSLATIONS } from "../utils/translations.js";
 
-export default function BackLink() {
+export default function BackLink({ subtle = false }) {
   const { lang } = useLanguage();
   const t = UI_TRANSLATIONS[lang] ?? UI_TRANSLATIONS.en;
   const label = t.backToArchive.replace(/^←\s*/, "");
 
   return (
-    <Link href="/" className="back-btn">
+    <Link href="/" className={subtle ? "back-btn back-btn-subtle" : "back-btn"}>
       <svg
         className="back-btn-arrow"
         width="14"
