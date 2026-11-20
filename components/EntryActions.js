@@ -42,7 +42,9 @@ export default function EntryActions({ entry, onDelete }) {
 
   return (
     <div style={styles.wrap}>
-      <Link href={`/contribute?id=${entry.id}`} style={styles.editLink}>{t.editBtn}</Link>
+      {entry.status !== "pending" && (
+        <Link href={`/contribute?id=${entry.id}`} style={styles.editLink}>{t.editBtn}</Link>
+      )}
       <button type="button" onClick={() => setConfirmOpen(true)} style={styles.delBtn}>{t.deleteBtn}</button>
       <ConfirmModal
         open={confirmOpen}

@@ -289,6 +289,7 @@ function ContributeForm() {
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(null); // null | "photo" | "save"
   const [loadingEntry, setLoadingEntry] = useState(isEdit);
+  const [pendingLocked, setPendingLocked] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
@@ -301,6 +302,11 @@ function ContributeForm() {
       if (error || !data) {
         setLoadingEntry(false);
         setBanner("loadEntryFailed");
+        return;
+      }
+      if (data.status === "pending") {
+        setPendingLocked(true);
+        setLoadingEntry(false);
         return;
       }
       setForm({
@@ -402,8 +408,9 @@ function ContributeForm() {
         const { data: reviewerFlag, error: rpcErr } = await supabase.rpc("is_reviewer");
         const isReviewer = !rpcErr && reviewerFlag === true;
         const updatePayload = isReviewer ? payload : { ...payload, status: "pending", review_note: null };
-        const { data, error: updateErr } = await supabase.from("entries")
-          .update(updatePayload).eq("id", editId).select();
+        let query = supabase.from("entries").update(updatePayload).eq("id", editId);
+        if (!isReviewer) query = query.neq("status", "pending");
+        const { data, error: updateErr } = await query.select();
         if (!updateErr && data && data.length > 0) {
           // Reviewers return to the archive; contributors see the pending entry on their dashboard.
           router.push(isReviewer ? "/" : "/my-entries");
@@ -458,6 +465,23 @@ function ContributeForm() {
       <main className="subpage-shell" style={styles.page}>
         <div className="subpage-card" style={styles.card}>
           <p style={{ color: "#86B29B", margin: 0 }}>{t.loadingEntry}</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (pendingLocked) {
+    return (
+      <main className="subpage-shell" style={styles.page}>
+        <div className="subpage-card" style={styles.card}>
+          <div style={styles.topBar}>
+            <BackLink />
+          </div>
+          <h1 style={styles.title}>{t.pendingLockedTitle}</h1>
+          <p style={{ ...styles.subtitle, lineHeight: 1.8 }}>{t.pendingLockedDesc}</p>
+          <p style={{ margin: 0 }}>
+            <Link href="/my-entries" style={styles.link}>{t.navMyEntries}</Link>
+          </p>
         </div>
       </main>
     );
