@@ -14,7 +14,7 @@ const statusLabel = (t, status) => (
 );
 
 const styles = {
-  page: { minHeight: "calc(100vh - 68px)", backgroundColor: "#0C1511", padding: "28px 16px 48px", fontFamily: "'Kantumruy Pro', sans-serif" },
+  page: { minHeight: "calc(100vh - 68px)", padding: "28px 16px 48px", fontFamily: "'Kantumruy Pro', sans-serif" },
   card: { maxWidth: 720, margin: "0 auto", backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: "32px 24px" },
   topBar: { display: "flex", alignItems: "center", marginBottom: 18 },
   title: { color: "#E8ECE9", fontSize: 24, margin: "0 0 4px" },

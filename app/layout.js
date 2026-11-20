@@ -30,7 +30,6 @@ export default function RootLayout({ children }) {
       <body
         style={{
           margin: 0,
-          backgroundColor: "#0C1511",
           color: "#DBE5DE",
           fontFamily: "'Kantumruy Pro', sans-serif",
           minHeight: "100vh",

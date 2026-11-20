@@ -10,7 +10,7 @@ import { UI_TRANSLATIONS } from "../../utils/translations.js";
 const supabase = createClient();
 
 const styles = {
-  page: { minHeight: "calc(100vh - 68px)", backgroundColor: "#0C1511", padding: "28px 16px 48px", fontFamily: "'Kantumruy Pro', sans-serif" },
+  page: { minHeight: "calc(100vh - 68px)", padding: "28px 16px 48px", fontFamily: "'Kantumruy Pro', sans-serif" },
   wrap: { maxWidth: 860, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 },
   topBar: { display: "flex", alignItems: "center", marginBottom: 4 },
   title: { color: "#E8ECE9", fontSize: 24, margin: "0 0 4px" },

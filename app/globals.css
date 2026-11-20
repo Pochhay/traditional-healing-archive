@@ -6,6 +6,15 @@ html, body {
   font-family: 'Kantumruy Pro', sans-serif;
 }
 
+body {
+  background-color: #09110D;
+  background-image:
+    radial-gradient(ellipse 85% 45% at 50% 0%, rgba(178, 208, 149, 0.025), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'%3E%3Cfilter id='paper' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.032' numOctaves='5' seed='7' stitchTiles='stitch' result='noise'/%3E%3CfeDiffuseLighting in='noise' lighting-color='%234a6b59' surfaceScale='3.2' result='light'%3E%3CfeDistantLight azimuth='48' elevation='36'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23paper)' opacity='0.13'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 560px, 512px 512px;
+}
+
 /* Browsers do not inherit body font-family into form controls by default. */
 button, input, textarea, select {
   font-family: inherit;
@@ -17,9 +26,11 @@ button, input, textarea, select {
   position: sticky;
   top: 0;
   z-index: 40;
-  background-color: rgba(12, 21, 17, 0.94);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid #1C2B24;
+  background-color: rgba(11, 20, 16, 0.9);
+  background-image: linear-gradient(180deg, rgba(22, 36, 29, 0.45) 0%, rgba(11, 20, 16, 0) 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #22382D;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.48), 0 2px 6px rgba(0, 0, 0, 0.36);
 }
 
 .site-nav-inner {
@@ -49,14 +60,14 @@ button, input, textarea, select {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  border-left: 2px solid #B2D095;
+  border-left: 2.5px solid #C6E5A6;
   padding-left: 10px;
   min-width: 0;
   flex-shrink: 0;
   text-decoration: none;
   transition: opacity 0.15s ease;
 }
-.hdr-brand:hover { opacity: 0.9; }
+.hdr-brand:hover { opacity: 0.92; }
 
 .hdr-auth {
   margin-left: auto;
@@ -80,17 +91,17 @@ button, input, textarea, select {
   border-radius: 6px;
   align-items: center;
   justify-content: center;
-  background-color: #121B17;
-  border: 1px solid #24382E;
-  color: #B4DBC4;
+  background-color: #0A130E;
+  border: 1px solid #2D483B;
+  color: #CFE8D8;
   cursor: pointer;
   flex-shrink: 0;
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 .hdr-menu-btn:hover {
-  background-color: #1A2821;
-  border-color: #3A5A4A;
-  color: #E8ECE9;
+  background-color: #16261E;
+  border-color: #466E5A;
+  color: #F2F7F4;
 }
 .lang-btn { min-width: 66px; text-align: center; }
 
@@ -105,7 +116,7 @@ button, input, textarea, select {
 .nav-link {
   font-size: 12.5px;
   font-weight: 500;
-  color: #9EB3A6;
+  color: #C4D6CB;
   text-decoration: none;
   padding: 5px 8px;
   border-radius: 6px;
@@ -115,41 +126,43 @@ button, input, textarea, select {
   transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
 .nav-link:hover {
-  color: #E8ECE9;
-  background-color: rgba(255, 255, 255, 0.04);
+  color: #F2F7F4;
+  background-color: rgba(10, 19, 14, 0.65);
+  border-color: rgba(178, 208, 149, 0.22);
 }
 
 .nav-cta {
   font-size: 12.5px;
   font-weight: 600;
-  color: #B2D095;
+  color: #CBE9AD;
   text-decoration: none;
   padding: 5px 10px;
   border-radius: 6px;
-  background-color: transparent;
-  border: 1px solid rgba(178, 208, 149, 0.3);
+  background-color: rgba(10, 19, 14, 0.65);
+  border: 1px solid rgba(178, 208, 149, 0.42);
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   white-space: nowrap;
   flex-shrink: 0;
 }
 .nav-cta:hover {
-  background-color: rgba(178, 208, 149, 0.12);
-  border-color: rgba(178, 208, 149, 0.5);
-  color: #D4F0B7;
+  background-color: rgba(24, 42, 32, 0.9);
+  border-color: rgba(198, 229, 166, 0.65);
+  color: #E5FACF;
 }
 
 .nav-link.nav-active,
 .nav-cta.nav-active {
-  background-color: #203229;
-  border-color: #3D6350;
-  color: #D2F0B2;
+  background-color: #1B3025;
+  border-color: #4E7D65;
+  color: #E2F9CA;
   font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 .nav-link.nav-active:hover,
 .nav-cta.nav-active:hover {
-  background-color: #243A2F;
-  border-color: #4A7861;
-  color: #E2F8C9;
+  background-color: #213A2D;
+  border-color: #5E9478;
+  color: #ECFDDA;
 }
 
 .back-btn {
@@ -195,18 +208,19 @@ button, input, textarea, select {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background-color: #121B17;
-  border: 1px solid #24382E;
+  background-color: #0A130E;
+  border: 1px solid #2D483B;
   border-radius: 6px;
   padding: 2px 3px 2px 9px;
   min-width: 0;
   max-width: 100%;
   flex-shrink: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
 }
 
 .nav-email {
   font-size: 12px;
-  color: #86B29B;
+  color: #9CC4AE;
   max-width: 118px;
   min-width: 0;
   overflow: hidden;
@@ -217,8 +231,8 @@ button, input, textarea, select {
 .nav-logout {
   font-size: 12px;
   font-weight: 500;
-  color: #C1C8C2;
-  background-color: #1D2C25;
+  color: #E2EBE5;
+  background-color: #1D3026;
   border: none;
   border-radius: 4px;
   padding: 4px 9px;
@@ -226,7 +240,7 @@ button, input, textarea, select {
   white-space: nowrap;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
-.nav-logout:hover { background-color: #273B31; color: #E8ECE9; }
+.nav-logout:hover { background-color: #284235; color: #FFFFFF; }
 
 .archive-footer {
   margin-top: 8px;
