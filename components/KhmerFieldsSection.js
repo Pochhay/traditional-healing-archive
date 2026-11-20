@@ -9,7 +9,6 @@ const FIELDS = [
   { key: "descriptionKm", label: "labelDescriptionKm", textarea: true },
   { key: "habitatKm", label: "labelHabitatKm", textarea: false },
   { key: "medicinalUsesKm", label: "labelUsesKm", textarea: true },
-  { key: "partsUsedKm", label: "labelPartsUsedKm", textarea: false },
   { key: "dosageKm", label: "labelDosageKm", textarea: true },
   { key: "cautionKm", label: "labelCautionKm", textarea: true },
 ];

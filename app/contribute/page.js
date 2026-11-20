@@ -255,7 +255,6 @@ const VALIDATORS = {
   descriptionKm: (f) => validateOptional(f.descriptionKm, 5000, true),
   habitatKm: (f) => validateOptional(f.habitatKm, 500, false),
   medicinalUsesKm: (f) => validateOptional(f.medicinalUsesKm, 5000, true),
-  partsUsedKm: (f) => validateOptional(f.partsUsedKm, 300, false),
   dosageKm: (f) => validateOptional(f.dosageKm, 1000, true),
   cautionKm: (f) => validateOptional(f.cautionKm, 1000, true),
 };
@@ -273,7 +272,7 @@ function ContributeForm() {
     nameKhmer: "", title: "", scientificName: "", family: "", description: "",
     habitat: "", medicinalUses: "", chemicalCompounds: [], dosage: "", caution: "",
     compoundsUnstudied: false, cautionNoneKnown: false,
-    descriptionKm: "", habitatKm: "", medicinalUsesKm: "", partsUsedKm: "", dosageKm: "", cautionKm: "",
+    descriptionKm: "", habitatKm: "", medicinalUsesKm: "", dosageKm: "", cautionKm: "",
   });
   const [photo, setPhoto] = useState(null);
   const [errors, setErrors] = useState({});
@@ -319,7 +318,6 @@ function ContributeForm() {
         descriptionKm: data.description_km ?? "",
         habitatKm: data.habitat_km ?? "",
         medicinalUsesKm: data.medicinal_uses_km ?? "",
-        partsUsedKm: data.parts_used_km ?? "",
         dosageKm: data.dosage_km ?? "",
         cautionKm: data.caution_km ?? "",
       });
@@ -378,7 +376,6 @@ function ContributeForm() {
       description_km: normalizeText(form.descriptionKm) || null,
       habitat_km: normalizeText(form.habitatKm) || null,
       medicinal_uses_km: normalizeText(form.medicinalUsesKm) || null,
-      parts_used_km: normalizeText(form.partsUsedKm) || null,
       dosage_km: normalizeText(form.dosageKm) || null,
       caution_km: normalizeText(form.cautionKm) || null,
       contributor: u.user_metadata?.username || u.email || "Anonymous",
