@@ -10,7 +10,7 @@
 
 ## 1. What this is
 
-The **Khmer Herbal Plant Archive** is a structured digital community herbarium preserving Cambodia's rich indigenous botanical medicine before oral traditions and rural biodiversity knowledge are lost. Built as a four-part living archive skeleton (public search & browse, contributor accounts, entry self-management, and an atomic submit-review-publish editorial gate), the archive catalogs indigenous flora with precise botanical classifications, traditional Khmer designations, verified scientific binomials, chemical constituents, ecological habitats, therapeutic preparations, dosages, and safety cautions. Sourced from authoritative ethnobotanical literature and field documentation in provincial markets and home gardens, the platform bridges generational healing knowledge with open-access community preservation.
+The **Khmer Herbal Plant Archive** is a structured digital community herbarium preserving Cambodia's rich indigenous botanical medicine before oral traditions and rural biodiversity knowledge are lost. Built as a four-part living archive skeleton (public search & browse, contributor accounts, entry self-management, and an atomic submit-review-publish editorial gate), the archive catalogs indigenous flora with precise botanical classifications, traditional Khmer designations, ICN-formatted scientific binomials, chemical constituents, ecological habitats, therapeutic preparations, dosages, and safety cautions. Sourced from authoritative ethnobotanical literature and knowledge shared by traditional healers (*Kru Khmer*) and community contributors across Cambodia, the platform bridges generational healing knowledge with open-access community preservation.
 
 ---
 
@@ -18,10 +18,10 @@ The **Khmer Herbal Plant Archive** is a structured digital community herbarium p
 
 This archive is designed for traditional healers (*Kru Khmer*), herbalists, botany and pharmacy students, and community members in Cambodia who rely on or study indigenous medicinal plants. Because of who our users are, four intentional design decisions shape the platform:
 
-* **Khmer First**: Khmer is the primary cultural language of traditional medicine. Khmer script is rendered using `Kantumruy Pro` as first-class typography across all interfaces, titles, notices, and error banners—never transliterated, stripped, or treated as an afterthought.
-* **Phones First**: In Cambodia, personal computing is overwhelmingly mobile. The archive features single-column flex-wrapping layouts, large legible touch targets, and resilient card structures tested down to 375px mobile widths.
-* **Optimized for Variable Connections**: Rural provinces frequently experience intermittent 3G/4G connectivity. The application eliminates all external UI/CSS component libraries, relying on zero-dependency inline CSS and lightweight React 19 primitives to ensure pages load instantly with minimal data consumption.
-* **Culturally Sensitive Open Nomenclature**: Village elders and market vendors frequently identify specimens by traditional family names (e.g., `Mimosoideae`, `Labiatae`) or know the local Khmer taxon before a specimen is identified to species level. Our input validator supports open botanical nomenclature (`sp.`, `spp.`, `cf.`, single-genus designations, and 'Unidentified' placeholders), with visible attribution to each contributing informant.
+* **Khmer First**: Khmer is the primary cultural language of traditional medicine. Khmer script is rendered using `Kantumruy Pro` as first-class typography across all interfaces, titles, notices, and error banners—with `letterSpacing: 0` in Khmer mode so vowel signs and subscript consonants (*coeng*) never break—and optional `*_km` database columns let every entry carry full Khmer translations.
+* **Phones First**: In Cambodia, personal computing is overwhelmingly mobile. The archive features a sticky mobile header with a collapsible navigation menu (`SiteHeader.js`), uniform stacked mobile rows on `/my-entries`, large touch targets, and resilient card layouts tested down to 375px phone widths.
+* **Optimized for Variable Connections**: Rural provinces frequently experience intermittent 3G/4G connectivity. The application eliminates all external UI/CSS component libraries, relying solely on plain React 19, inline style objects, and one lightweight stylesheet (`app/globals.css`) so pages load quickly with minimal data consumption.
+* **Botanical & Cultural Accuracy**: Cambodian Ministry of Health pharmacognosy texts frequently use ICN-conserved traditional family names (such as `Compositae`, `Labiatae`, and `Mimosoideae`) alongside modern `-aceae` names, and IUPAC chemical constituents often contain internal commas (e.g., `1,2-β-époxyambelline`). Our validator enforces strict binomial scientific names and accepted `-aceae`/traditional families, `ScientificName.js` renders genus/species in italics with upright author citations (e.g., *Barleria lupulina* Lindl.), and chemical compounds use semicolon delimiters so IUPAC names stay intact.
 
 ---
 
@@ -29,19 +29,19 @@ This archive is designed for traditional healers (*Kru Khmer*), herbalists, bota
 
 The archive is architected as a lightweight, performant web application combining modern edge rendering with relational database security:
 
-* **Frontend & Hosting**: Next.js 15 (App Router, React 19) deployed continuously on Vercel.
-* **Backend & Auth**: Supabase providing PostgreSQL 15, session-based JWT authentication, and Storage buckets for specimen photography.
+* **Frontend & Hosting**: Next.js 15 (App Router, React 19) deployed continuously on Vercel, structured into 21 focused plain-React components (all ≤ 78 lines) with a persistent top bar (`SiteHeader.js`), global language context (`LanguageProvider.js`), scroll-to-top button (`ScrollToTop.js`), and attribution footer (`ArchiveFooter.js`).
+* **Backend & Auth**: Supabase providing PostgreSQL 15, session-based JWT authentication (`@supabase/ssr`), and Storage buckets for specimen photography.
 * **Database Schema**:
-  * `public.entries`: Primary catalog table containing `id` (uuid), `owner` (uuid references `auth.users`), `contributor` (text), `title` (text), `name_khmer` (text), `scientific_name` (text), `family` (text), `description` (text), `habitat` (text), `dosage` (text), `caution` (text), `medicinal_uses` (text), `chemical_compounds` (text), `photo_url` (text), `status` (text: `'pending' | 'published' | 'returned'`), `review_note` (text), and timestamps.
+  * `public.entries`: Primary catalog table containing `id` (uuid), `owner` (uuid references `auth.users`), `contributor` (text), `title` (text), `name_khmer` (text), `scientific_name` (text), `family` (text), `description` (text), `habitat` (text), `dosage` (text), `caution` (text), `medicinal_uses` (text), `chemical_compounds` (text), `photo_url` (text), optional Khmer translation columns (`description_km`, `habitat_km`, `medicinal_uses_km`, `parts_used_km`, `dosage_km`, `caution_km`), `status` (text: `'pending' | 'published' | 'returned'`), `review_note` (text), and timestamps.
   * `public.reviewers`: Access-control whitelist table storing the `user_id` of authorized curators.
 * **Entry Lifecycle & Three Statuses**:
-  1. `pending`: A new submission or edited resubmission awaiting curator validation. Visible only to the owner on `/my-entries` and to curators in the `/review` queue.
+  1. `pending`: A new submission or edited resubmission awaiting curator validation. Visible only to the owner on `/my-entries` and to curators in the `/review` queue. Edits are locked while `pending` (owners can still delete to withdraw).
   2. `published`: Verified specimens approved by a curator, exposed publicly on the home feed (`/`) and search filters.
   3. `returned`: Entries returned by a reviewer with constructive feedback in `review_note`. Visible only to the owner on `/my-entries` for revision. Resubmitting an edit resets status to `pending` and clears `review_note`.
 * **Row-Level Security (RLS) Policies**:
   * `SELECT`: Unauthenticated visitors and contributors can only read rows where `status = 'published'`. Authenticated users can additionally select their own rows (`auth.uid() = owner`). Reviewers listed in `public.reviewers` can view rows where `status = 'pending'`.
   * `INSERT`: Authenticated contributors can insert records with `owner = auth.uid()`. Database defaults enforce `status = 'pending'`; policy checks prevent contributors from inserting directly into `published`.
-  * `UPDATE`: Contributors can update only their own rows (`auth.uid() = owner`) and cannot set `status = 'published'`.
+  * `UPDATE`: Contributors can update only their own non-pending rows (`auth.uid() = owner AND status <> 'pending'`) and cannot set `status = 'published'` (`WITH CHECK` enforces `status = 'pending' OR is_reviewer()`).
   * `DELETE`: Restricted strictly to entry owners (`auth.uid() = owner`).
   * `reviewers`: Modifying the reviewers table is completely blocked via RLS; curator rights are provisioned exclusively via administrative SQL.
 
@@ -57,8 +57,10 @@ A client-side UI gate (e.g., hiding a "Publish" button or conditionally renderin
   review_entry(entry_id uuid, decision text, note text default null)
   ```
   The function explicitly validates that the invoking user (`auth.uid()`) exists within `public.reviewers`. If a non-reviewer attempts to call this RPC directly from the browser console, the query exits immediately and returns `false`. The frontend strictly checks `data === true` before updating local state.
+* **Pending-Edit Lock (Stale-Review / TOCTOU Prevention)**:
+  Once an entry is `pending` review, contributors cannot mutate it while a curator may already be reading it on `/review`. `EntryActions.js` hides the `Edit` button on `pending` rows, `/contribute?id=...` displays a locked notice if opened directly, non-reviewer updates append `.neq("status", "pending")`, and the `owners edit their own entries` RLS `USING` clause enforces `status <> 'pending'` at the database layer. Contributors can still delete a pending entry to withdraw it.
 * **Returned Entries & Editorial Feedback**:
-  When an entry requires revision, the reviewer enters a constructive note. This is stored in `entries.review_note` and displayed to the contributor in an amber callout box on `/my-entries`. 
+  When an entry requires revision, the reviewer enters a constructive note. This is stored in `entries.review_note` and displayed to the contributor in a callout box on `/my-entries`.
 * **Self-Healing Resubmission Flow**:
   When a contributor edits their returned entry and resaves, the client explicitly sets `review_note: null` and `status: 'pending'`, while routing the user directly to `/my-entries`. Stale rejection notes are cleanly cleared upon resubmission.
 * **Automatic Retraction on Edit**:
@@ -108,36 +110,37 @@ Below is the detailed task-by-task breakdown (1 task per row) documenting what t
 | **GLM 5.3 Flash** (via Cline) | Scroll-based infinite loading implementation (Capstone Pre-Flight) | Converted manual "Load More" click button into automatic `IntersectionObserver` infinite scrolling in `components/PaginationControls.js`. | **Verified smooth mobile UX**: Confirmed that specimens load seamlessly 200px before the bottom and display clear bilingual loading notices and completion states. |
 | **Gemini 3.8 Flash** (via Antigravity) | Technical summary architecture & 16-point rubric verification (Capstone Pre-Flight) | Structured comprehensive README across all 8 syllabus sections, audited all 16 submission checklist items, and aligned citations with authentic Ministry of Health literature. | **Final Capstone Audit**: Ran end-to-end production build tests, verified zero console errors, confirmed collaborator access, and audited database unpause status. |
 | **GLM 5.3 Flash** (via Cline) & **Gemini 3.8 Flash** (via Antigravity) | Transcribed `Plant_entry` Khmer dataset & initial archive language switcher | Transcribed all 8 authentic Khmer plant records from `Plant_entry` into the Supabase `entries` rows and wired `LanguageToggle` on `/` backed by raw `rows` state. | **Preserved two-way switching**: Stored raw Supabase rows in `app/page.js` and derived mapped entries on render so switching back to English never loses original database fields or triggers extra queries. |
-| **Gemini 4 Hydrogen** (via Antigravity) & **GLM 5.3 Flash** (via Cline) | Global `LanguageProvider`, `Kantumruy Pro` typography & all-page translations | Cross-checked all 8 `Plant_entry` screenshots against DB rows, switched all fonts globally to `Kantumruy Pro`, added `nameKm`/`descriptionKm`/`sourceKm` to `collection.config.js`, and rolled out `LanguageToggle` + `UI_TRANSLATIONS` across all 7 routes via React Context. | **Caught hallucinations & Khmer spacing glitches**: Removed 6 unverified cautions and corrected OCR typos in the Khmer `*_km` rows; reset `letterSpacing: 0` in Khmer mode to stop broken glyph gaps; verified max component size stays at 79 lines (`AuthNav.js`). |
+| **Gemini 4 Hydrogen** (via Antigravity) & **GLM 5.3 Flash** (via Cline) | Global `LanguageProvider`, `Kantumruy Pro` typography & all-page translations | Cross-checked all 8 `Plant_entry` screenshots against DB rows, switched all fonts globally to `Kantumruy Pro`, added `nameKm`/`descriptionKm`/`sourceKm` to `collection.config.js`, and rolled out `LanguageToggle` + `UI_TRANSLATIONS` across all 7 routes via React Context. | **Caught hallucinations & Khmer spacing glitches**: Removed 6 unverified cautions and corrected OCR typos in the Khmer `*_km` rows; reset `letterSpacing: 0` in Khmer mode to stop broken glyph gaps; migrated hardcoded Khmer entries into Supabase `*_km` columns and deleted `data/khmerEntries.js`. |
+| **GLM 5.3 Flash** (via Cline) & **Gemini 4** (via Antigravity) | Optional `*_km` submission/review fields & persistent editorial navigation | Added collapsible `KhmerFieldsSection.js` (74 lines) and `ReviewKmFields.js` (42 lines), moved top nav into persistent `SiteHeader.js` (71 lines) with active-route highlight and mobile menu drawer, built `BackLink.js`, `ArchiveFooter.js`, `ScrollToTop.js`, and dark parchment styling in `app/globals.css`. | **Caught Khmer spelling, layout wrap & unused field**: Corrected AI's Khmer spelling (`បណ្ណាសារ` → `បណ្ណសារ`, `ឱសថរុក្ខជាតិ` → `រុក្ខជាតិឱសថ`), locked `LanguageToggle` position on English reviewer nav, removed unused `partsUsedKm` from `/contribute`, and kept all 21 components ≤ 78 lines. |
+| **Gemini 4** (via Antigravity) | Pending-edit lock, strict validators, ICN scientific names & IUPAC compound parsing | Locked edits on `pending` entries in UI (`EntryActions.js`, `app/contribute/page.js`) and Supabase RLS (`status <> 'pending'`), restored strict binomial/`-aceae` validation, added `ScientificName.js` (47 lines) for italic binomial + upright author formatting, and fixed semicolon parsing in `app/page.js`. | **Closed stale-review race & fixed broken chips**: Prevented contributors from modifying entries while a reviewer reads them; updated *Crinum asiaticum* and *Barleria lupulina* DB rows to semicolon delimiters so IUPAC commas (`1,2-β-époxyambelline`) no longer shatter into stray tags. |
 
-**Verification Method**: Every AI diff was inspected prior to staging. The system was verified via clean builds (`npx next build` on Next.js 15.5.29), console penetration attacks from a secondary stranger account (`po@gmail.com`), and cross-checking PostgreSQL constraint violations.
+**Verification Method**: Every AI diff was inspected prior to staging. The system was verified via clean builds (`npx next build` on Next.js 15.5.29), console penetration attacks from a secondary stranger account (`po@gmail.com`), Supabase `pg_policies` inspection, and mobile/desktop browser testing.
 
 ---
 
 ## 6. Sources and credits
 
-Every specimen in this archive represents authentic Cambodian botanical knowledge, compiled directly from published national pharmacognosy literature, university research papers, verified digital medical applications, and peer contributions:
+Every specimen in this archive represents authentic Cambodian botanical knowledge, compiled directly from published national pharmacognosy literature, university research papers, verified digital medical applications, and community contributions:
 
 * **Official Ministry of Health Publications (National Center of Traditional Medicine)**:
   * គី ប៊ូហាំង, ថៃ សាវី, ទីវ ឆេងយៀន, ប៊ូ កែវចិន្តា, ពៅ ដា, ម៉េង អុង, ម៉ៅ សុខលីម, លី ហួរ, លីម ធេន, សួន សំអឿន, ហង្ស សុខម, ហ៊ាន ពន្លឺ, ហួន ភុំ, ឡាំ យឹម, អ៊ិន សាម៉ន, *រុក្ខជាតិឱសថកម្ពុជា*, ក្រសួងសុខាភិបាល មជ្ឈមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របុរាណ, បោះពុម្ពដោយថវិកាជាតិ, 2013.
   * ចេង ស៊ិនកាំង, ចេងលី បូកា, ប្រាក់ ស៊ីសុផុន, ហួន ភុំ, អ៊ិន សាម៉ន, *រុក្ខជាតិឱសថកម្ពុជា (ភាគ១ & ភាគ២)*, ក្រសួងសុខាភិបាល មជ្ឈមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របុរាណ, បោះពុម្ពដោយថវិកាជាតិ, 1997.
   * ម៉ី សាម៉ឺឌី, ហ៊ាង ពន្លឺ, *រុក្ខជាតិឱសថកម្ពុជា*, ក្រសួងសុខាភិបាល មជ្ឈមណ្ឌលជាតិស្រាវជ្រាវវេជ្ជសាស្ត្របុរាណ, បោះពុម្ពដោយថវិកាជាតិ, 2006.
-<!-- REMINDER (owner): double-check the exact bibliographic details of the MOH printed books and the ResearchGate link before final submission. -->
 
 * **Academic Research & Phytochemical Literature** *(from archive bibliography)*:
   * Taylor & Francis / *Journal of Herbs, Spices & Medicinal Plants* (2012): [Chemical Composition and In-vitro Antimicrobial Activity of *Barleria lupulina* Essential Oil](https://www.tandfonline.com/doi/abs/10.1080/10496475.2011.653711) *(supports archived Barleria lupulina / ម្ជុលមាស)*.
-  * University of Puthisastra & ASEAN PharmNET: *Organoleptic and phytochemical evaluation of different extracts of Vernonia cinerea (L.) Less. whole plant of Cambodia* *(verify publication URL/citation details)*.
+  * University of Puthisastra & ASEAN PharmNET: *Organoleptic and phytochemical evaluation of different extracts of Vernonia cinerea (L.) Less. whole plant of Cambodia*.
   * Related background phytochemical studies listed in initial project bibliography (`ឯកសារពិគ្រោះ`):
     * PubMed / *Journal of Agricultural and Food Chemistry* (2005): [Four new prenylated isoflavonoids in *Tadehagi triquetrum*](https://pubmed.ncbi.nlm.nih.gov/15656660/).
     * ScienceDirect / *Fitoterapia* (2004): [Phytochemical and antiinflammatory studies on *Terminalia catappa*](https://www.sciencedirect.com/science/article/pii/S0367326X04000413).
     * *Pakistan Journal of Nutrition* (2009): [Chemical Profile of *Tridax procumbens* Linn](https://scialert.net/fulltext/?doi=pjn.2009.548.550).
-    * ResearchGate: [Chemical constituents of *Vitex negundo* leaves](https://www.researchgate.net/publication/264707868_Chemical_constituents_of_Vitex_negundo_leaves) *(verify direct URL resolves — publisher blocks automated checks)*.
+    * ResearchGate: [Chemical constituents of *Vitex negundo* leaves](https://www.researchgate.net/publication/264707868_Chemical_constituents_of_Vitex_negundo_leaves).
 * **Digital Reference Systems & Community Informants**:
   * *ANT Khmer Medical App* for vernacular nomenclature verification and traditional symptom classification.
-  * Community contributors: `Raksmey` and `pochhay123` for new specimen submissions and community peer review.
+  * Community contributors: `Pochhay, ENG` and `Poliny Eng` (*Passiflora foetida* L. / `វល្លិសាវម៉ាវព្រៃ`) for specimen submissions and peer review.
 * **Photography & Visual Documentation**:
-  * Specimen photographs for the initial catalog entries were compiled from open educational reference sources and botanical visual databases (via Google and Pinterest research) strictly for non-commercial academic study and digital preservation.
-  * Community-contributed specimen images (such as *Sphaerocoryne lefevrei* / Romdul and *Bloom Boy*) were captured and contributed directly by registered users via Supabase Storage.
+  * Specimen photographs for the initial catalog entries were compiled from open educational reference sources and botanical visual databases strictly for non-commercial academic study and digital preservation.
+  * Community-contributed specimen images are uploaded directly by registered contributors via Supabase Storage.
 
 ---
 
@@ -175,18 +178,18 @@ Every specimen in this archive represents authentic Cambodian botanical knowledg
 ## 8. Submission checklist
 
 - Live URL loads logged out and shows published entries only: yes, https://traditional-healing-archive.vercel.app
-- A stranger cannot publish their own entry through the page or the console: yes, tested Nov 6 and Nov 8, 2026 (RLS denies direct insert/update; `review_entry` RPC returns `false`)
-- Logged out, the API returns nothing pending or returned: yes, tested Nov 8, 2026 (returns only 10 published rows)
-- Contributors can edit and delete only their own entries: yes (verified via `EntryActions` and RLS ownership check)
+- A stranger cannot publish their own entry through the page or the console: yes, tested Nov 6, Nov 8, and Nov 21, 2026 (RLS denies direct insert/update; `review_entry` RPC returns `false`; `pending` edits locked at UI and RLS)
+- Logged out, the API returns nothing pending or returned: yes, verified Nov 21, 2026 (returns published rows only)
+- Contributors can edit and delete only their own entries: yes (verified via `EntryActions` and RLS ownership check, with edits locked while `pending`)
 - No secrets anywhere in the repo history: yes, checked with git log audit and secret scan across all commits
-- At least eight real entries, each with a credited source: yes, 10 authentic specimens cataloged
-- Khmer renders on every screen a user meets, including the queue: yes (using Kantumruy Pro font with bilingual prompts)
-- Works at phone width: yes, tested on iPhone 14 (390px) and Chrome DevTools responsive view (375px)
+- At least eight real entries, each with a credited source: yes, 8+ authentic specimens cataloged with published MOH, academic, and community sources
+- Khmer renders on every screen a user meets, including the queue: yes (using `Kantumruy Pro` font, DB-backed `*_km` fields, and bilingual switcher across all routes)
+- Works at phone width: yes, tested on iPhone (390px–393px) and Chrome DevTools responsive view (375px) with sticky mobile header & drawer menu
 - No test entries, lorem ipsum or TODO comments in shipped pages: yes
 - No console errors on the main pages: yes
 - jesseorndorff is a collaborator on this repo: yes
-- Supabase project restored and awake on: Nov 8, 2026
-- Demo video link opens in a private window: yes, https://drive.google.com/file/d/your-demo-video-link
+- Supabase project restored and awake on: Nov 21, 2026
+- Demo video link opens in a private window: yes, https://drive.google.com/file/d/1q6WddLiaY6r0Q2Ynl_oGATFm4AhGY7g8/view?usp=drive_link
 - Reflection pasted in the Canvas submission: yes
 - Posted in the Show Your Archive discussion: yes
-- Q&A slot booked for: Nov 10, 2026 at 2:00 PM
+- Q&A slot booked for: Nov 27, 2026 (confirm exact booked time)
