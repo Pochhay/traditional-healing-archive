@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "../../utils/supabase/client";
 import EntryActions from "../../components/EntryActions.js";
 import BackLink from "../../components/BackLink.js";
+import ScientificName from "../../components/ScientificName.js";
 import { useLanguage } from "../../components/LanguageProvider.js";
 import { UI_TRANSLATIONS } from "../../utils/translations.js";
 
@@ -21,7 +22,7 @@ const styles = {
   row: { display: "flex", flexDirection: "column", gap: 10, padding: "14px 0", borderBottom: "1px solid #2D4A3E" },
   rowTop: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" },
   rowActions: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" },
-  name: { color: "#DBE5DE", fontSize: 15, fontWeight: 600, margin: 0 }, sci: { color: "#86B29B", fontSize: 12, fontStyle: "italic", margin: "2px 0 0" },
+  name: { color: "#DBE5DE", fontSize: 15, fontWeight: 600, margin: 0 }, sci: { color: "#86B29B", fontSize: 12, margin: "2px 0 0" },
   badge: { fontSize: 12, padding: "4px 10px", borderRadius: 4, border: "1px solid #2D4A3E", color: "#DBE5DE", backgroundColor: "#07100C", whiteSpace: "nowrap" },
   reviewerNote: { width: "100%", backgroundColor: "rgba(255, 180, 171, 0.08)", border: "1px solid rgba(255, 180, 171, 0.3)", color: "#FFB4AB", fontSize: 12, padding: "8px 10px", borderRadius: 4, margin: "6px 0 0", lineHeight: 1.6 },
   note: { color: "#86B29B", margin: 0, lineHeight: 1.8 },
@@ -76,10 +77,10 @@ export default function MyEntriesPage() {
         ) : (
           entries.map((entry) => (
             <div key={entry.id} style={styles.row}>
-              <div style={styles.rowTop}>
+              <div className="my-entry-row-top" style={styles.rowTop}>
                 <div>
                   <p style={styles.name}>{entry.title}</p>
-                  <p style={styles.sci}>{entry.scientific_name}</p>
+                  <p style={styles.sci}><ScientificName name={entry.scientific_name} /></p>
                 </div>
                 <div style={styles.rowActions}>
                   <span style={styles.badge}>{statusLabel(t, entry.status)}</span>

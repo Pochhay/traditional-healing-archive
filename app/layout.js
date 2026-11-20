@@ -2,6 +2,7 @@ import "./globals.css";
 import collection from "../collection.config.js";
 import { LanguageProvider } from "../components/LanguageProvider.js";
 import SiteHeader from "../components/SiteHeader.js";
+import ScrollToTop from "../components/ScrollToTop.js";
 
 export const metadata = {
   title: collection.name,
@@ -38,6 +39,7 @@ export default function RootLayout({ children }) {
         <LanguageProvider>
           <SiteHeader />
           {children}
+          <ScrollToTop />
         </LanguageProvider>
       </body>
     </html>

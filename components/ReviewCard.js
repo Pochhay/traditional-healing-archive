@@ -2,6 +2,7 @@
 
 import ReviewActions from "./ReviewActions.js";
 import ReviewKmFields from "./ReviewKmFields.js";
+import ScientificName from "./ScientificName.js";
 import { useLanguage } from "./LanguageProvider.js";
 import { UI_TRANSLATIONS } from "../utils/translations.js";
 
@@ -9,7 +10,7 @@ const S = {
   card: { backgroundColor: "#18221D", border: "1px solid #2D4A3E", borderRadius: 4, padding: 18, display: "flex", flexDirection: "column", gap: 12 },
   head: { display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 8, borderBottom: "1px solid #232C27", paddingBottom: 8 },
   khmer: { fontSize: 20, fontWeight: 600, color: "#A3D1B8", margin: 0 },
-  sci: { fontFamily: "'Kantumruy Pro', sans-serif", fontStyle: "italic", fontSize: 13, color: "#B2D095", margin: 0 },
+  sci: { fontFamily: "'Kantumruy Pro', sans-serif", fontSize: 13, color: "#B2D095", margin: 0 },
   body: { display: "flex", flexWrap: "wrap", gap: 16 },
   photo: { width: 180, height: 130, objectFit: "cover", borderRadius: 3, border: "1px solid #2D4A3E", backgroundColor: "#0C1511" },
   fields: { flex: "1 1 320px", display: "flex", flexDirection: "column", gap: 8, minWidth: 0, overflowWrap: "anywhere" },
@@ -34,7 +35,7 @@ export default function ReviewCard({ entry, onDecided }) {
       <div style={S.head}>
         <div>
           <h2 style={S.khmer}>{entry.name_khmer}</h2>
-          <p style={S.sci}>{entry.title} · {entry.scientific_name} · {entry.family}</p>
+          <p style={S.sci}>{entry.title} · <ScientificName name={entry.scientific_name} /> · {entry.family}</p>
         </div>
         <span style={S.sci}>{entry.contributor} · {new Date(entry.created_at).toLocaleDateString(lang === "km" ? "km-KH" : "en-US")}</span>
       </div>

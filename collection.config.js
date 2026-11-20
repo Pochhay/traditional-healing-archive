@@ -19,7 +19,7 @@ const collection = {
 
   // Where does your knowledge come from?
   source:
-    "Published ethnobotanical and pharmacological records of Cambodian flora, cross-referenced with plants documented in provincial markets and home gardens across Cambodia.",
+    "Published ethnobotanical and pharmacological records of Cambodian flora, cross-referenced with knowledge shared by traditional healers (Kru Khmer) and community contributors across Cambodia.",
 
   // Khmer identity — shown when the visitor switches to ភាសាខ្មែរ.
   nameKm: "បណ្ណសាររុក្ខជាតិឱសថខ្មែរ",
@@ -27,7 +27,7 @@ const collection = {
     "បណ្ណសារឌីជីថលរៀបចំជាលក្ខណៈប្រព័ន្ធដែលចងក្រងឯកសារអំពីរុក្ខជាតិឱសថនៃប្រទេសកម្ពុជា — រុក្ខសាស្ត្រ សមាសធាតុគីមី ទីជម្រក និងការប្រើប្រាស់ក្នុងការព្យាបាលបែបបុរាណ។",
   curatorKm: "Pochhay, ENG", // Curator's proper name stays exact in both languages.
   sourceKm:
-    "ឯកសារស្រាវជ្រាវរុក្ខសាស្ត្រ និងឱសថសាស្ត្របុរាណស្តីពីរុក្ខជាតិកម្ពុជា ដែលបានផ្ទៀងផ្ទាត់ជាមួយរុក្ខជាតិឱសថតាមទីផ្សារ និងសួនច្បារតាមផ្ទះនៅទូទាំងប្រទេសកម្ពុជា។",
+    "ឯកសារស្រាវជ្រាវរុក្ខសាស្ត្រ និងឱសថសាស្ត្របុរាណស្តីពីរុក្ខជាតិកម្ពុជា ដែលបានផ្ទៀងផ្ទាត់ជាមួយចំណេះដឹងពីគ្រូខ្មែរ និងអ្នកចូលរួមចងក្រងនៅទូទាំងប្រទេសកម្ពុជា។",
 };
 
 export default collection;

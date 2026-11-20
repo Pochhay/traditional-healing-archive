@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import HerbariumHeader from "../components/HerbariumHeader.js";
+import ArchiveFooter from "../components/ArchiveFooter.js";
 import SearchFilter from "../components/SearchFilter.js";
 import EntryCard from "../components/EntryCard.js";
 import PaginationControls from "../components/PaginationControls.js";
@@ -18,6 +19,11 @@ function mapEntry(row, currentLang) {
   const isKm = currentLang === "km";
   const dbUses = row.medicinal_uses ? row.medicinal_uses.split("\n").filter(Boolean) : [];
   const kmUses = row.medicinal_uses_km ? row.medicinal_uses_km.split("\n").filter(Boolean) : null;
+  const rawCompounds = row.chemical_compounds || "";
+  const chemicalCompounds = rawCompounds
+    ? (/[;\n]/.test(rawCompounds) ? rawCompounds.split(/[;\n]/) : rawCompounds.split(","))
+        .map((c) => c.trim()).filter(Boolean)
+    : [];
   return {
     id: row.id,
     owner: row.owner,
@@ -26,7 +32,7 @@ function mapEntry(row, currentLang) {
     scientificName: row.scientific_name,
     family: row.family,
     image: row.photo_url,
-    chemicalCompounds: row.chemical_compounds ? row.chemical_compounds.split(",").map((c) => c.trim()).filter(Boolean) : [],
+    chemicalCompounds,
     nameKhmer: row.name_khmer,
     // Khmer mode: submitted *_km columns, falling back to the English DB row.
     description: isKm ? row.description_km || row.description : row.description,
@@ -51,10 +57,6 @@ const styles = {
   },
   error: { color: "#FFB4AB" },
   loading: { color: "#86B29B" },
-  footer: {
-    marginTop: 32, paddingTop: 20, borderTop: "1px solid #232C27", fontSize: 13, color: "#86B29B",
-    textAlign: "center", fontFamily: "'Kantumruy Pro', sans-serif",
-  },
 };
 
 export default function Home() {
@@ -130,7 +132,7 @@ export default function Home() {
         <PaginationControls total={filtered.length} visible={shown.length} lang={lang}
           onLoadMore={() => setVisible((v) => v + PAGE_SIZE)} />
       )}
-      <footer style={{ ...styles.footer, letterSpacing: lang === "km" ? 0 : 0.3 }}>{t.footer}</footer>
+      <ArchiveFooter />
     </main>
   );
 }

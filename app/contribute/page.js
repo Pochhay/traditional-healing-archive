@@ -34,11 +34,8 @@ function randomId() {
 }
 const TRADITIONAL_FAMILIES = [
   "Compositae", "Leguminosae", "Umbelliferae", "Cruciferae",
-  "Labiatae", "Guttiferae", "Palmae", "Gramineae",
+  "Labiatae", "Guttiferae", "Palmae", "Gramineae", "Mimosoideae",
 ];
-
-// Open nomenclature placeholders — case-insensitive.
-const UNKNOWN_TAXON = /^(unknown|unidentified|to be identified|to be determined)$/i;
 
 /* ---------- Global hygiene ---------- */
 
@@ -115,31 +112,26 @@ function validateTitle(raw) {
 function validateScientificName(raw) {
   const { value, error } = cleanSingle(raw);
   if (error) return error;
-  if (!value) return "Scientific name is required. / ឈ្មោះវិទ្យាសាស្ត្រជាការចាំបាច់។";
-  if (codepoints(value) > 120) return "Scientific name must be 120 characters or fewer. / ឈ្មោះវិទ្យាសាស្ត្រមិនត្រូវលើសពី 120 តួអក្សរទេ។";
-  if (UNKNOWN_TAXON.test(value)) return null; // Khmer-only submissions stay unblocked.
-  if (/\d/.test(value)) return "Scientific name must not contain digits. / ឈ្មោះវិទ្យាសាស្ត្រមិនត្រូវមានលេខទេ។";
+  if (!value) return "Scientific name is required.";
+  if (codepoints(value) > 120) return "Scientific name must be 120 characters or fewer.";
+  if (/\d/.test(value)) return "Scientific name must not contain digits.";
   if (!/^[A-Za-zÀ-ÿ\u00D7\s.,&()'\-]+$/.test(value))
-    return "Scientific name contains invalid characters. / ឈ្មោះវិទ្យាសាស្ត្រមានតួអក្សរមិនសមរម្យទេ។";
-  const words = value.split(/\s+/).filter(Boolean);
-  if (!/^[A-ZÀ-Ý]/.test(words[0]))
-    return "The genus must start with a capital letter (e.g. Leea). / ឈ្មោះជាតិត្រូវចាប់ផ្តើមដោយអក្សរធំ។";
-  if (words.length === 1) return null; // genus-only designation (e.g. "Leea")
-  if (!/^[a-zà-ÿ\u00D7]/.test(words[1]))
-    return "Words after the genus must be lowercase (e.g. sp., × piperita). / ពាក្យបន្ទាប់ពីឈ្មោះជាតិត្រូវជាអក្សរតូច។";
+    return "Scientific name contains invalid characters.";
+  const words = value.split(/\s+/);
+  if (words.length < 2) return "Scientific name must include a genus and a species epithet.";
+  if (!/^[A-ZÀ-Ý]/.test(words[0])) return "The genus must start with a capital letter.";
+  if (!/^[a-zà-ÿ]/.test(words[1])) return "The species epithet must be lowercase.";
   return null;
 }
 
 function validateFamily(raw) {
   const { value, error } = cleanSingle(raw);
   if (error) return error;
-  if (!value) return "Family is required. / គ្រួសារជាការចាំបាច់។";
-  if (codepoints(value) > 120) return "Family must be 120 characters or fewer. / គ្រួសារមិនត្រូវលើសពី 120 តួអក្សរទេ។";
-  if (UNKNOWN_TAXON.test(value)) return null; // family pending determination
-  if (!/^[A-Z][a-z]+$/.test(value))
-    return "Family must be a single capitalized word. / គ្រួសារត្រូវជាពាក្យតែមួយ ហើយចាប់ផ្តើមដោយអក្សរធំ។";
-  if (!/(aceae|oideae)$/.test(value) && !TRADITIONAL_FAMILIES.includes(value))
-    return "Family must end in -aceae or -oideae, be a traditional name (e.g. Compositae), or Unknown if pending identification. / គ្រួសារត្រូវបញ្ចប់ដោយ -aceae ឬ -oideae ជាឈ្មោះប្រពៃណី ឬសរសេរ Unknown ប្រសិនបើមិនទាន់កំណត់។";
+  if (!value) return "Family is required.";
+  if (codepoints(value) > 120) return "Family must be 120 characters or fewer.";
+  if (!/^[A-Z][a-z]+$/.test(value)) return "Family must be a single capitalized word.";
+  if (!/aceae$/.test(value) && !TRADITIONAL_FAMILIES.includes(value))
+    return "Family must end in -aceae or be an accepted traditional name.";
   return null;
 }
 
